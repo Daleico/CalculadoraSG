@@ -74,11 +74,6 @@ export function simularComercial(nomeDistribuidora: string, descontoPercentual: 
     
     const economiaBase = faturaAtualBase - faturaSGBase;
 
-    console.log("--- DEBUG DE CÁLCULO ---");
-    console.log(`Distribuidora usada no cálculo: ${nomeNorm}`);
-    console.log(`Tarifa SG calculada: ${tarifaSgBruta}`);
-    console.log(`Fatura SG final: ${faturaSG}`);
-
     const cenarios = Object.entries(bandeirasTarifarias).map(([nomeBandeira, valorBandeira]) => {
         // Concessionária: bandeira incide sobre o consumo total do cliente
         const acrescimoConcessionaria = (valorBandeira / 1000) * consumoKwh;
