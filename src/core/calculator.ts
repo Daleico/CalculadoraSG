@@ -162,3 +162,69 @@ function calcularMesProjecao(
 
     return { semSolarGrid, comSolarGrid };
 }
+
+export function calcularProjecaoAnual(params: {
+    distribuidora: string;
+    consumoKwh: number;
+    descontoPercentual: number;
+    consumoMinimo: number;
+    cenario100Verde: boolean;
+    promocaoAtiva: PromocaoComercial;
+}): ProjecaoAnual {
+    const { distribuidora, consumoKwh, descontoPercentual, consumoMinimo, cenario100Verde, promocaoAtiva } = params;
+
+    const bandeirasDoAno: readonly string[] = cenario100Verde
+        ? Array(12).fill('Verde')
+        : BANDEIRAS_CENARIO_MISTO;
+
+    const zeraInjecao: boolean[] = Array(12).fill(false);
+    const multiplicadorInjecao: number[] = Array(12).fill(1.0);
+
+    switch (promocaoAtiva) {
+        case '1_GRATIS':
+            zeraInjecao[0] = true;
+            break;
+        case '2_GRATIS':
+            zeraInjecao[0] = true;
+            zeraInjecao[1] = true;
+            break;
+        case '50_OFF':
+            multiplicadorInjecao[0] = 0.5;
+            break;
+        case 'NENHUMA':
+        default:
+            break;
+    }
+
+    const paresBrutos: Array<{ sem: number; com: number }> = [];
+    for (let i = 0; i < 12; i++) {
+        const nomeBandeira = bandeirasDoAno[i];
+        const valorBandeira = bandeirasTarifarias[nomeBandeira];
+        const { semSolarGrid, comSolarGrid } = calcularMesProjecao(
+            distribuidora,
+            descontoPercentual,
+            consumoKwh,
+            consumoMinimo,
+            valorBandeira,
+            zeraInjecao[i],
+            multiplicadorInjecao[i],
+        );
+        paresBrutos.push({ sem: semSolarGrid, com: comSolarGrid });
+    }
+
+    let economiaBrutaAnual = 0;
+    for (let i = 0; i < 12; i++) {
+        economiaBrutaAnual += paresBrutos[i].sem - paresBrutos[i].com;
+    }
+
+    const dadosGrafico = paresBrutos.map((par, i) => ({
+        name: NOMES_MESES[i],
+        semSolarGrid: Math.round(par.sem * 100) / 100,
+        comSolarGrid: Math.round(par.com * 100) / 100,
+        economia: Math.round((par.sem - par.com) * 100) / 100,
+    }));
+
+    const economiaAnualTotal = Math.round(economiaBrutaAnual * 100) / 100;
+
+    return { dadosGrafico, economiaAnualTotal };
+}
