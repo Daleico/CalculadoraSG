@@ -200,6 +200,9 @@ export function calcularProjecaoAnual(params: {
     for (let i = 0; i < 12; i++) {
         const nomeBandeira = bandeirasDoAno[i];
         const valorBandeira = bandeirasTarifarias[nomeBandeira];
+        if (valorBandeira === undefined) {
+            throw new Error(`Bandeira tarifária desconhecida: ${nomeBandeira}`);
+        }
         const { semSolarGrid, comSolarGrid } = calcularMesProjecao(
             distribuidora,
             descontoPercentual,
