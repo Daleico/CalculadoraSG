@@ -37,7 +37,7 @@ export function calcularTarifaSG(nomeDistribuidora: string, descontoPercentual: 
 
     // 2. Subtraia o valorDesconto e os impostos do TotalC
     const tarifaSgBruta = (dados.TotalC - valorDesconto - icmsNI - pisNI) / 1000;
-    const tarifaSG = Number(tarifaSgBruta.toFixed(4));
+    const tarifaSG = tarifaSgBruta;
 
     return {
         tarifaSG,
@@ -70,10 +70,7 @@ export function simularComercial(nomeDistribuidora: string, descontoPercentual: 
     const impostosConcessionaria = ((icmsNI + pisNI) / 1000) * energiaInjetada;
     const custoMinimoConcessionaria = (consumoMinimo / 1000) * dados.TotalC;
 
-    const faturaSGBase =
-        Math.round(faturaSG * 100) / 100 +
-        Math.round(impostosConcessionaria * 100) / 100 +
-        Math.round(custoMinimoConcessionaria * 100) / 100;
+    const faturaSGBase = Math.round((faturaSG + impostosConcessionaria + custoMinimoConcessionaria) * 100) / 100;
     
     const economiaBase = faturaAtualBase - faturaSGBase;
 

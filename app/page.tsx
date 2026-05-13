@@ -203,7 +203,7 @@ function App() {
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-gray-800">
                       <span className="text-gray-400 text-sm">Tarifa SG (Valor Unitário)</span>
-                      <span className="text-solar-400 font-medium">{resultado.tarifaSG_kWh.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 4, maximumFractionDigits: 4 })} / kWh</span>
+                      <span className="text-solar-400 font-medium">{resultado.tarifaSG_kWh.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 6, maximumFractionDigits: 6 })} / kWh</span>
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-gray-800">
                       <span className="text-gray-400 text-sm">Fatura SG (Referente à injeção)</span>

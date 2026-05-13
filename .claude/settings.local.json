@@ -3,7 +3,18 @@
     "allow": [
       "Bash(npm install *)",
       "Bash(npx tsc *)",
-      "Bash(Remove-Item *)"
+      "Bash(Remove-Item *)",
+      "Bash(dir \"C:\\\\Users\\\\daniel.leiner_solarg\\\\Desktop\" /B)",
+      "Bash(python3 *)",
+      "Bash(node -e ' *)",
+      "Bash(node *)",
+      "Bash(python -c \"import openpyxl; print\\(openpyxl.__version__\\)\")",
+      "Bash(python -c \"import pandas; print\\('pandas ok'\\)\")",
+      "Bash(pip install *)",
+      "Bash(python *)",
+      "Bash(dir docs *)",
+      "Bash(dir docs\\\\superpowers /B)",
+      "Bash(git add *)"
     ]
   }
 }
