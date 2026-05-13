@@ -1,4 +1,4 @@
-import type { DistribuidoraValores, ResultadoCalculoSG, SimulacaoComercial } from './types';
+import type { DistribuidoraValores, ResultadoCalculoSG, SimulacaoComercial, PromocaoComercial, ProjecaoAnual } from './types';
 import { distribuidorasData, bandeirasTarifarias } from './data';
 
 export function normalizarNomeDistribuidora(nome: string): string {
@@ -115,3 +115,12 @@ export function simularComercial(nomeDistribuidora: string, descontoPercentual: 
         cenarios
     };
 }
+
+const NOMES_MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'] as const;
+
+const BANDEIRAS_CENARIO_MISTO: readonly string[] = [
+    'Verde', 'Verde', 'Verde', 'Verde', 'Verde', 'Verde',
+    'Amarela', 'Amarela', 'Amarela',
+    'Vermelha P1', 'Vermelha P1',
+    'Vermelha P2',
+];
