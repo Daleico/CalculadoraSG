@@ -41,3 +41,17 @@ export interface SimulacaoComercial {
     };
     cenarios: SimulacaoBandeira[];
 }
+
+export type PromocaoComercial = 'NENHUMA' | '1_GRATIS' | '2_GRATIS' | '50_OFF';
+
+export interface PontoGraficoMensal {
+    name: string;
+    semSolarGrid: number;
+    comSolarGrid: number;
+    economia: number;
+}
+
+export interface ProjecaoAnual {
+    dadosGrafico: PontoGraficoMensal[];
+    economiaAnualTotal: number;
+}
