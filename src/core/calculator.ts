@@ -118,9 +118,9 @@ export function simularComercial(nomeDistribuidora: string, descontoPercentual: 
 
 const NOMES_MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'] as const;
 
-const BANDEIRAS_CENARIO_MISTO: readonly string[] = [
+const BANDEIRAS_CENARIO_MISTO = [
     'Verde', 'Verde', 'Verde', 'Verde', 'Verde', 'Verde',
     'Amarela', 'Amarela', 'Amarela',
     'Vermelha P1', 'Vermelha P1',
     'Vermelha P2',
-];
+] as const;
