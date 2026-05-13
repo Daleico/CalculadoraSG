@@ -54,7 +54,7 @@ console.log(`      faturaAtualBase  = ${formatCurrency(mensal.faturaAtualBase)}`
 console.log(`      faturaSGBase     = ${formatCurrency(mensal.faturaSGBase)}`);
 console.log(`      economiaBase     = ${formatCurrency(mensal.economiaBase)}`);
 console.log(`      12 × economiaBase= ${formatCurrency(mensal.economiaBase * 12)} (esperado ≈ economia anual)`);
-console.log(`      delta            = ${formatCurrency(Math.abs(mensal.economiaBase * 12 - baseline.economiaAnualTotal))} (deve ser ≤ R$ 0,12)`);
+console.log(`      delta            = ${formatCurrency(Math.abs(mensal.economiaBase * 12 - baseline.economiaAnualTotal))} (deve ser ≤ R$ 0,06)`);
 
 // Sanity 2: 100% Verde + 1_GRATIS — Janeiro sem injeção SG
 imprimirCenario('Cenário 2: 100% Verde, 1_GRATIS (Janeiro grátis)', true, '1_GRATIS');
