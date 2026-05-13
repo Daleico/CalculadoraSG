@@ -1,18 +1,18 @@
 import type { DistribuidoraValores } from './types';
 
 export const distribuidorasData: Record<string, DistribuidoraValores> = {
-    "RGE":          { TotalC: 1044.67, TotalS: 822.20, PIS: 43.27, ICMSTE: 66.362, ICMSTUSD: 112.84,  regraIcmsNI: "CHEIO", regraPisCofinsNI: "CHEIO"  },
-    "EDP SP":       { TotalC: 1012.01, TotalS: 786.70, PIS: 41.41, ICMSTE: 77.15,  ICMSTUSD: 106.75,  regraIcmsNI: "TUSD",  regraPisCofinsNI: "CHEIO"  },
-    "ELEKTRO":      { TotalC: 1021.885, TotalS: 796.05, PIS: 41.90, ICMSTE: 73.53,  ICMSTUSD: 110.41,  regraIcmsNI: "TUSD",  regraPisCofinsNI: "CHEIO"  },
-    "COELBA":       { TotalC: 1112.325, TotalS: 837.72, PIS: 44.084, ICMSTE: 76.28,  ICMSTUSD: 154.23,  regraIcmsNI: "CHEIO", regraPisCofinsNI: "CHEIO"  },
-    "LIGHT":        { TotalC: 1139.705, TotalS: 841.73, PIS: 44.30, ICMSTE: 109.82, ICMSTUSD: 143.85,  regraIcmsNI: "TUSD",  regraPisCofinsNI: "ISENTO" },
-    "CEMIG":        { TotalC: 1104.475, TotalS: 858.58, PIS: 45.19, ICMSTE: 74.17,  ICMSTUSD: 126.54,  regraIcmsNI: "ISENTO",regraPisCofinsNI: "CHEIO"  },
-    "EQUATORIAL GO":{ TotalC: 1161.70, TotalS: 891.81, PIS: 46.94, ICMSTE: 81.04,  ICMSTUSD: 141.92,  regraIcmsNI: "TUSD",  regraPisCofinsNI: "CHEIO"  },
-    "EMR":          { TotalC: 1106.275, TotalS: 817.04, PIS: 43.00, ICMSTE: 106.89, ICMSTUSD: 139.34,  regraIcmsNI: "TUSD",  regraPisCofinsNI: "CHEIO"  },
-    "ESS":          { TotalC: 959.345,  TotalS: 745.76, PIS: 39.25, ICMSTE: 75.29,  ICMSTUSD: 99.04,   regraIcmsNI: "TUSD",  regraPisCofinsNI: "CHEIO"  },
-    "ENEL RJ":      { TotalC: 1252.98, TotalS: 925.39, PIS: 48.70, ICMSTE: 88.42,  ICMSTUSD: 190.46,  regraIcmsNI: "TUSD",  regraPisCofinsNI: "CHEIO"  },
-    "CPFL PAULISTA":{ TotalC: 869.00,  TotalS: 675.53, PIS: 35.55, ICMSTE: 67.18,  ICMSTUSD: 90.74,   regraIcmsNI: "TUSD",  regraPisCofinsNI: "CHEIO"  },
-    "EQUATORIAL PI":{ TotalC: 1107.89, TotalS: 829.00, PIS: 43.63, ICMSTE: 69.96,  ICMSTUSD: 165.30,  regraIcmsNI: "TUSD",  regraPisCofinsNI: "CHEIO"  },
+    "RGE":          { TotalC: 1044.67112,  TotalS: 822.20, PIS: 43.27368421, ICMSTE: 66.35448718,  ICMSTUSD: 112.8429487, regraIcmsNI: "CHEIO",  regraPisCofinsNI: "CHEIO"  },
+    "EDP SP":       { TotalC: 1012.009159, TotalS: 786.70, PIS: 41.40526316, ICMSTE: 77.14987013,  ICMSTUSD: 106.754026,  regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO"  },
+    "ELEKTRO":      { TotalC: 1021.887035, TotalS: 796.05, PIS: 41.89736842, ICMSTE: 73.52503209,  ICMSTUSD: 110.4146341, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO"  },
+    "COELBA":       { TotalC: 1112.324083, TotalS: 837.72, PIS: 44.09052632, ICMSTE: 76.28751678,  ICMSTUSD: 154.2260403, regraIcmsNI: "CHEIO",  regraPisCofinsNI: "CHEIO"  },
+    "LIGHT":        { TotalC: 1139.703634, TotalS: 841.73, PIS: 44.30157895, ICMSTE: 109.8221918,  ICMSTUSD: 143.849863,  regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO"  },
+    "CEMIG":        { TotalC: 1104.475434, TotalS: 858.58, PIS: 45.18842105, ICMSTE: 74.16935065,  ICMSTUSD: 126.5376623, regraIcmsNI: "ISENTO", regraPisCofinsNI: "CHEIO"  },
+    "EQUATORIAL GO":{ TotalC: 1161.699868, TotalS: 891.81, PIS: 46.93736842, ICMSTE: 81.035,       ICMSTUSD: 141.9175,    regraIcmsNI: "ISENTO", regraPisCofinsNI: "CHEIO"  },
+    "EMR":          { TotalC: 1106.273338, TotalS: 817.04, PIS: 43.00210526, ICMSTE: 106.8928767,  ICMSTUSD: 139.3383562, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO"  },
+    "ESS":          { TotalC: 959.3440328, TotalS: 745.76, PIS: 39.25052632, ICMSTE: 75.29376623,  ICMSTUSD: 99.03974026, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO"  },
+    "ENEL RJ":      { TotalC: 1252.979394, TotalS: 925.39, PIS: 48.70473684, ICMSTE: 88.42493151,  ICMSTUSD: 190.459726,  regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO"  },
+    "CPFL PAULISTA":{ TotalC: 869.0003144, TotalS: 675.53, PIS: 35.55421053, ICMSTE: 67.17974026,  ICMSTUSD: 90.73636364, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO"  },
+    "EQUATORIAL PI":{ TotalC: 1107.888336, TotalS: 829.00, PIS: 43.63157895, ICMSTE: 69.96121622,  ICMSTUSD: 165.2955405, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO"  },
 };
 
 export const bandeirasTarifarias: Record<string, number> = {
