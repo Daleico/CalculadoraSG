@@ -124,3 +124,41 @@ const BANDEIRAS_CENARIO_MISTO = [
     'Vermelha P1', 'Vermelha P1',
     'Vermelha P2',
 ] as const;
+
+function calcularMesProjecao(
+    nomeDistribuidora: string,
+    descontoPercentual: number,
+    consumoKwh: number,
+    consumoMinimo: number,
+    valorBandeiraKwh: number,
+    promoZeraInjecao: boolean,
+    promoMultiplicadorInjecao: number,
+): { semSolarGrid: number; comSolarGrid: number } {
+    const nomeNorm = normalizarNomeDistribuidora(nomeDistribuidora);
+
+    if (!(nomeNorm in distribuidorasData)) {
+        throw new Error(`Distribuidora não encontrada: ${nomeNorm}`);
+    }
+
+    const dados = distribuidorasData[nomeNorm];
+    const { icmsNI, pisNI } = calcularImpostos(dados);
+
+    const energiaInjetada = consumoKwh - consumoMinimo;
+
+    const faturaSGInjecaoBruta =
+        ((dados.TotalC - dados.TotalS * (descontoPercentual / 100) - icmsNI - pisNI) / 1000) * energiaInjetada;
+
+    const faturaSGInjecaoFinal = promoZeraInjecao
+        ? 0
+        : faturaSGInjecaoBruta * promoMultiplicadorInjecao;
+
+    const impostosNI = ((icmsNI + pisNI) / 1000) * energiaInjetada;
+    const custoMinimoConcessionaria = (consumoMinimo / 1000) * dados.TotalC;
+    const acrescimoBandeiraSG = (valorBandeiraKwh / 1000) * consumoMinimo;
+    const acrescimoBandeiraConcessionaria = (valorBandeiraKwh / 1000) * consumoKwh;
+
+    const semSolarGrid = (dados.TotalC / 1000) * consumoKwh + acrescimoBandeiraConcessionaria;
+    const comSolarGrid = faturaSGInjecaoFinal + impostosNI + custoMinimoConcessionaria + acrescimoBandeiraSG;
+
+    return { semSolarGrid, comSolarGrid };
+}
