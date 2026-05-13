@@ -15,7 +15,9 @@ export const distribuidorasData: Record<string, DistribuidoraValores> = {
     "EQUATORIAL PI":{ TotalC: 1107.888336, TotalS: 829.00, PIS: 43.63157895, ICMSTE: 69.96121622,  ICMSTUSD: 165.2955405, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO"  },
 };
 
-export const bandeirasTarifarias: Record<string, number> = {
+export type NomeBandeira = 'Verde' | 'Amarela' | 'Vermelha P1' | 'Vermelha P2';
+
+export const bandeirasTarifarias: Record<NomeBandeira, number> = {
     "Verde": 0,
     "Amarela": 18.85,
     "Vermelha P1": 44.63,

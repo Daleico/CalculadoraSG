@@ -1,5 +1,5 @@
 import type { DistribuidoraValores, ResultadoCalculoSG, SimulacaoComercial, PromocaoComercial, ProjecaoAnual } from './types';
-import { distribuidorasData, bandeirasTarifarias } from './data';
+import { distribuidorasData, bandeirasTarifarias, type NomeBandeira } from './data';
 
 export function normalizarNomeDistribuidora(nome: string): string {
     let nomeNorm = nome.trim().toUpperCase();
@@ -55,8 +55,7 @@ export function calcularTarifaSG(nomeDistribuidora: string, descontoPercentual: 
 export function simularComercial(nomeDistribuidora: string, descontoPercentual: number, consumoKwh: number, consumoMinimo: number): SimulacaoComercial {
     const resultadoTarifa = calcularTarifaSG(nomeDistribuidora, descontoPercentual);
     const tarifaSG_kWh = resultadoTarifa.tarifaSG;
-    const tarifaSgBruta = resultadoTarifa.tarifaSgBruta;
-    
+
     const nomeNorm = resultadoTarifa.detalhes.distribuidora;
     const dados = distribuidorasData[nomeNorm];
     const { icmsNI, pisNI } = resultadoTarifa.detalhes;
@@ -168,8 +167,8 @@ export function calcularProjecaoAnual(params: {
 }): ProjecaoAnual {
     const { distribuidora, consumoKwh, descontoPercentual, consumoMinimo, cenario100Verde, promocaoAtiva } = params;
 
-    const bandeirasDoAno: readonly string[] = cenario100Verde
-        ? Array(12).fill('Verde')
+    const bandeirasDoAno: readonly NomeBandeira[] = cenario100Verde
+        ? (Array(12).fill('Verde') as NomeBandeira[])
         : BANDEIRAS_CENARIO_MISTO;
 
     const zeraInjecao: boolean[] = Array(12).fill(false);
@@ -195,9 +194,6 @@ export function calcularProjecaoAnual(params: {
     for (let i = 0; i < 12; i++) {
         const nomeBandeira = bandeirasDoAno[i];
         const valorBandeira = bandeirasTarifarias[nomeBandeira];
-        if (valorBandeira === undefined) {
-            throw new Error(`Bandeira tarifária desconhecida: ${nomeBandeira}`);
-        }
         const { semSolarGrid, comSolarGrid } = calcularMesProjecao(
             distribuidora,
             descontoPercentual,
