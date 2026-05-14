@@ -43,6 +43,7 @@ function BarraControles({
                     type="button"
                     role="switch"
                     aria-checked={cenario100Verde}
+                    aria-label="Ativar Cenário 100% Bandeira Verde"
                     onClick={() => onToggleCenario(!cenario100Verde)}
                     className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${cenario100Verde ? 'bg-emerald-500' : 'bg-gray-700'}`}
                 >
@@ -110,7 +111,7 @@ function GraficoProjecao({ dados }: { dados: ProjecaoAnual['dadosGrafico'] }) {
                 <BarChart3 className="w-5 h-5 text-solar-500" />
                 <h3 className="text-lg font-semibold text-white">Projeção Anual</h3>
             </div>
-            <div className="h-[360px] w-full">
+            <div className="h-[280px] sm:h-[340px] md:h-[360px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={dados}
