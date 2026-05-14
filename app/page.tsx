@@ -439,6 +439,20 @@ function App() {
           </div>
 
         </div>
+
+        {resultado && projecao && !erro && (
+          <section className="mt-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <BarraControles
+              cenario100Verde={cenario100Verde}
+              onToggleCenario={setCenario100Verde}
+              promocaoAtiva={promocaoAtiva}
+              onSelectPromocao={setPromocaoAtiva}
+            />
+            <GraficoProjecao dados={projecao.dadosGrafico} />
+            <CardEconomiaAnual valor={projecao.economiaAnualTotal} />
+          </section>
+        )}
+
       </div>
     </div>
   );
