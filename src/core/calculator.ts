@@ -112,13 +112,6 @@ export function simularComercial(nomeDistribuidora: string, descontoPercentual: 
 
 const NOMES_MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'] as const;
 
-const BANDEIRAS_CENARIO_MISTO = [
-    'Verde', 'Verde', 'Verde', 'Verde', 'Verde', 'Verde',
-    'Amarela', 'Amarela', 'Amarela',
-    'Vermelha P1', 'Vermelha P1',
-    'Vermelha P2',
-] as const;
-
 function calcularMesProjecao(
     nomeDistribuidora: string,
     descontoPercentual: number,
@@ -162,14 +155,14 @@ export function calcularProjecaoAnual(params: {
     consumoKwh: number;
     descontoPercentual: number;
     consumoMinimo: number;
-    cenario100Verde: boolean;
+    bandeirasMensais: readonly NomeBandeira[];
     promocaoAtiva: PromocaoComercial;
 }): ProjecaoAnual {
-    const { distribuidora, consumoKwh, descontoPercentual, consumoMinimo, cenario100Verde, promocaoAtiva } = params;
+    const { distribuidora, consumoKwh, descontoPercentual, consumoMinimo, bandeirasMensais, promocaoAtiva } = params;
 
-    const bandeirasDoAno: readonly NomeBandeira[] = cenario100Verde
-        ? (Array(12).fill('Verde') as NomeBandeira[])
-        : BANDEIRAS_CENARIO_MISTO;
+    if (bandeirasMensais.length !== 12) {
+        throw new Error(`bandeirasMensais deve ter 12 posicoes, recebido ${bandeirasMensais.length}`);
+    }
 
     const zeraInjecao: boolean[] = Array(12).fill(false);
     const multiplicadorInjecao: number[] = Array(12).fill(1.0);
@@ -192,7 +185,7 @@ export function calcularProjecaoAnual(params: {
 
     const paresBrutos: Array<{ sem: number; com: number }> = [];
     for (let i = 0; i < 12; i++) {
-        const nomeBandeira = bandeirasDoAno[i];
+        const nomeBandeira = bandeirasMensais[i];
         const valorBandeira = bandeirasTarifarias[nomeBandeira];
         const { semSolarGrid, comSolarGrid } = calcularMesProjecao(
             distribuidora,
@@ -207,8 +200,12 @@ export function calcularProjecaoAnual(params: {
     }
 
     let economiaBrutaAnual = 0;
+    let custoSemBrutoAnual = 0;
+    let custoComBrutoAnual = 0;
     for (let i = 0; i < 12; i++) {
         economiaBrutaAnual += paresBrutos[i].sem - paresBrutos[i].com;
+        custoSemBrutoAnual += paresBrutos[i].sem;
+        custoComBrutoAnual += paresBrutos[i].com;
     }
 
     const dadosGrafico = paresBrutos.map((par, i) => ({
@@ -219,6 +216,8 @@ export function calcularProjecaoAnual(params: {
     }));
 
     const economiaAnualTotal = Math.round(economiaBrutaAnual * 100) / 100;
+    const custoTotalSemSG = Math.round(custoSemBrutoAnual * 100) / 100;
+    const custoTotalComSG = Math.round(custoComBrutoAnual * 100) / 100;
 
-    return { dadosGrafico, economiaAnualTotal };
+    return { dadosGrafico, economiaAnualTotal, custoTotalSemSG, custoTotalComSG };
 }
