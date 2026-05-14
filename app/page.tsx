@@ -6,7 +6,7 @@ import type { NomeBandeira } from '../src/core/data';
 import { simularComercial, calcularProjecaoAnual } from '../src/core/calculator';
 import type { SimulacaoComercial, PromocaoComercial, ProjecaoAnual } from '../src/core/types';
 import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator, BarChart3, Pencil, X, ChevronUp, ChevronDown } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Rectangle } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -17,6 +17,59 @@ function formatCurrency(value: number): string {
 
 function formatYAxisTick(v: number): string {
   return `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`;
+}
+
+function useIsDesktop(breakpoint: number = 1024): boolean {
+  const [isDesktop, setIsDesktop] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia(`(min-width: ${breakpoint}px)`);
+    const apply = () => setIsDesktop(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, [breakpoint]);
+
+  return isDesktop;
+}
+
+function SwitchComparativo({
+  ativo,
+  onChange,
+}: {
+  ativo: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={ativo}
+      aria-label="Alternar visão comparativa de custo"
+      onClick={() => onChange(!ativo)}
+      className={`group inline-flex items-center gap-3 rounded-xl border px-3.5 py-2 transition-colors ${
+        ativo
+          ? 'border-solar-500/40 bg-solar-500/[0.07]'
+          : 'border-gray-800 bg-gray-950/60 hover:border-gray-700'
+      }`}
+    >
+      <span
+        className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+          ativo ? 'bg-solar-500' : 'bg-gray-700'
+        }`}
+      >
+        <span
+          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
+            ativo ? 'translate-x-[18px]' : 'translate-x-[3px]'
+          }`}
+        />
+      </span>
+      <span className="text-sm font-medium text-gray-200 whitespace-nowrap">
+        Ver Comparativo de Custo
+      </span>
+    </button>
+  );
 }
 
 function CustomNumberInput({
@@ -90,14 +143,33 @@ function CustomNumberInput({
 
 
 type PontoMes = ProjecaoAnual['dadosGrafico'][number];
+type PontoMesEnriquecido = PontoMes & { __index: number };
 
-function TooltipMes({ active, payload }: { active?: boolean; payload?: Array<{ payload: PontoMes }> }) {
+function TooltipMes({
+    active,
+    payload,
+    bandeirasMensais,
+}: {
+    active?: boolean;
+    payload?: Array<{ payload: PontoMesEnriquecido }>;
+    bandeirasMensais?: readonly NomeBandeira[];
+}) {
     if (!active || !payload || payload.length === 0) return null;
     const ponto = payload[0].payload;
+    const bandeira = bandeirasMensais ? bandeirasMensais[ponto.__index] : undefined;
+    const corBandeira = bandeira ? CORES_BANDEIRAS[bandeira] : '#9ca3af';
 
     return (
-        <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 shadow-2xl min-w-[200px]">
-            <p className="text-sm font-semibold text-white mb-3">{ponto.name}</p>
+        <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 shadow-2xl min-w-[220px]">
+            <div className="flex items-center justify-between gap-4 mb-3">
+                <p className="text-sm font-semibold text-white">{ponto.name}</p>
+                {bandeira && (
+                    <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-gray-400">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ background: corBandeira }} />
+                        {bandeira}
+                    </span>
+                )}
+            </div>
             <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between items-center">
                     <span className="text-gray-400">Sem SolarGrid</span>
@@ -167,112 +239,289 @@ function TickComBandeira(props: {
     payload?: { value: string; index: number };
     bandeirasMensais: readonly NomeBandeira[];
     onToggleBandeira?: (i: number) => void;
+    orientation?: 'x' | 'y';
 }) {
-    const { x = 0, y = 0, payload, bandeirasMensais, onToggleBandeira } = props;
+    const { x = 0, y = 0, payload, bandeirasMensais, onToggleBandeira, orientation = 'x' } = props;
     if (!payload) return null;
     const cor = CORES_BANDEIRAS[bandeirasMensais[payload.index]];
+
+    if (orientation === 'y') {
+        return (
+            <g
+                transform={`translate(${x},${y})`}
+                onClick={() => onToggleBandeira?.(payload.index)}
+                style={{ cursor: onToggleBandeira ? 'pointer' : 'default' }}
+                className="group outline-none"
+            >
+                <title>Clique para alterar a bandeira</title>
+                <rect x={-58} y={-14} width={56} height={28} fill="transparent" />
+                <text
+                    x={-20}
+                    y={0}
+                    dy={4}
+                    textAnchor="end"
+                    fill="#9ca3af"
+                    fontSize={12}
+                    className="group-hover:text-white transition-colors"
+                >
+                    {payload.value}
+                </text>
+                <rect
+                    x={-14}
+                    y={-3}
+                    width={8}
+                    height={6}
+                    rx={2}
+                    fill={cor}
+                    className="group-hover:opacity-80 transition-opacity"
+                />
+            </g>
+        );
+    }
+
     return (
-        <g 
+        <g
             transform={`translate(${x},${y})`}
             onClick={() => onToggleBandeira?.(payload.index)}
             style={{ cursor: onToggleBandeira ? 'pointer' : 'default' }}
             className="group outline-none"
         >
             <title>Clique para alterar a bandeira</title>
-            {/* Hit area invisivel expandida para facilitar o clique */}
             <rect x={-20} y={0} width={40} height={32} fill="transparent" />
             <text x={0} y={0} dy={12} textAnchor="middle" fill="#9ca3af" fontSize={12} className="group-hover:text-white transition-colors">
                 {payload.value}
             </text>
-            {/* Quadrado colorido (agora maior e mais visível) */}
             <rect x={-8} y={20} width={16} height={6} rx={2} fill={cor} className="group-hover:opacity-80 transition-opacity" />
         </g>
     );
 }
 
-function CustomBarShape(props: any) {
-    const { x, y, width, height, payload } = props;
-    if (!payload) return null;
+const COR_ECONOMIA = '#10B981';        // emerald-500 — visão padrão (economia)
+const COR_SEM_SG   = '#EF4444';        // red-500    — Sem SolarGrid (custo alto, alerta)
+const COR_COM_SG   = '#F59E0B';        // solar-500  — Com SolarGrid (custo reduzido)
 
-    if (payload.isOutlier) {
-        return (
-            <g>
-                <Rectangle x={x} y={y} width={width} height={height} fill="#10b981" fillOpacity={0.8} radius={[4, 4, 0, 0]} />
-                <line x1={x - 2} y1={y} x2={x + width + 2} y2={y} stroke="#059669" strokeWidth={2} strokeDasharray="4 2" />
-                <text x={x + width / 2} y={y - 8} textAnchor="middle" fill="#10b981" fontSize={11} fontWeight="bold">
-                    PROMO
-                </text>
-            </g>
-        );
-    }
-
-    return <Rectangle x={x} y={y} width={width} height={height} fill="#f59e0b" radius={[4, 4, 0, 0]} />;
-}
-
-function GraficoProjecao({ dados, bandeirasMensais, onToggleBandeira }: {
+function GraficoProjecao({
+    dados,
+    bandeirasMensais,
+    onToggleBandeira,
+    visualizacaoComparativa,
+}: {
     dados: ProjecaoAnual['dadosGrafico'];
     bandeirasMensais: readonly NomeBandeira[];
     onToggleBandeira: (i: number) => void;
+    visualizacaoComparativa: boolean;
 }) {
-    const maxVal = Math.max(...dados.map(d => d.comSolarGrid));
-    
-    // Identifica outliers (abaixo de 70% do máximo)
-    const chartDisplayData = dados.map(d => ({
-        ...d,
-        isOutlier: d.comSolarGrid < maxVal * 0.7,
-        displayValue: d.comSolarGrid,
-    }));
+    const isDesktop = useIsDesktop();
 
-    const normais = chartDisplayData.filter(d => !d.isOutlier);
-    const normalMin = normais.length > 0 ? Math.min(...normais.map(d => d.comSolarGrid)) : maxVal;
-    
-    const diff = maxVal - normalMin;
-    const padding = diff < 5 ? 3 : diff * 0.05;
-    
-    // Foca rigidamente nos meses normais
-    const yAxisDomain = [Math.max(0, normalMin - padding), maxVal + padding];
+    const dadosEnriquecidos = useMemo(
+        () => dados.map((d, i) => ({ ...d, __index: i })),
+        [dados],
+    );
 
-    // Para outliers, força a barra a ser apenas um "toco" visível próximo ao eixo inferior
-    chartDisplayData.forEach(d => {
-        if (d.isOutlier) {
-            d.displayValue = Math.max(0, normalMin - padding + (padding * 0.15));
+    // Visão padrão (economia): domínio comprimido para destacar a variação mensal
+    const economiaDomain = useMemo<[number, number]>(() => {
+        const vals = dados.map((d) => d.economia);
+        const min = Math.min(...vals);
+        const max = Math.max(...vals);
+        const diff = max - min;
+        if (diff < Math.max(1, max * 0.005)) {
+            return [0, Math.max(max * 1.1, 1)];
         }
-    });
+        const padding = Math.max(diff * 0.15, max * 0.02);
+        return [Math.max(0, min - padding), max + padding];
+    }, [dados]);
 
+    // Visão comparativa (overlay): a barra mais alta sempre é semSolarGrid
+    const comparativoDomain = useMemo<[number, number]>(() => {
+        const max = Math.max(...dados.map((d) => d.semSolarGrid));
+        return [0, max * 1.08];
+    }, [dados]);
+
+    const valueDomain = visualizacaoComparativa ? comparativoDomain : economiaDomain;
+
+    const containerHeight = isDesktop
+        ? (visualizacaoComparativa ? 420 : 380)
+        : (visualizacaoComparativa ? 560 : 480);
+
+    const tickColor = '#9ca3af';
+    const gridColor = '#1f2937';
+    const axisColor = '#374151';
+
+    const tooltipNode = (
+        <Tooltip
+            content={<TooltipMes bandeirasMensais={bandeirasMensais} />}
+            cursor={{ fill: '#1f2937', opacity: 0.4 }}
+        />
+    );
+
+    const titleNode = (
+        <div className="flex items-center justify-between gap-3 mb-5 lg:mb-6">
+            <div className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-solar-500" />
+                <h3 className="text-base lg:text-lg font-semibold text-white">Projeção Anual</h3>
+            </div>
+            {visualizacaoComparativa ? (
+                <span className="hidden sm:inline-flex items-center gap-2 text-[10px] uppercase tracking-widest text-gray-500">
+                    <span
+                        aria-hidden
+                        className="inline-block w-2.5 h-2.5 rounded-sm ring-1 ring-white/10"
+                        style={{ backgroundColor: COR_SEM_SG }}
+                    />
+                    <span>Sem</span>
+                    <span className="text-gray-600 normal-case tracking-normal">vs.</span>
+                    <span
+                        aria-hidden
+                        className="inline-block w-2.5 h-2.5 rounded-sm ring-1 ring-white/10"
+                        style={{ backgroundColor: COR_COM_SG }}
+                    />
+                    <span>Com SolarGrid</span>
+                </span>
+            ) : (
+                <span className="hidden sm:inline-flex items-center gap-2 text-[10px] uppercase tracking-widest text-gray-500">
+                    <span
+                        aria-hidden
+                        className="inline-block w-2.5 h-2.5 rounded-sm ring-1 ring-white/10"
+                        style={{ backgroundColor: COR_ECONOMIA }}
+                    />
+                    <span>Economia mensal</span>
+                </span>
+            )}
+        </div>
+    );
+
+    // DESKTOP (lg+) — barras verticais, meses no XAxis
+    if (isDesktop) {
+        return (
+            <div>
+                {titleNode}
+                <div style={{ height: containerHeight }} className="w-full">
+                    <ResponsiveContainer width="100%" height="100%" className="focus:outline-none" style={{ outline: 'none' }}>
+                        <BarChart
+                            data={dadosEnriquecidos}
+                            margin={{ top: 16, right: 12, bottom: 16, left: 4 }}
+                            barCategoryGap={visualizacaoComparativa ? '22%' : '16%'}
+                            barGap={4}
+                            className="focus:outline-none"
+                            style={{ outline: 'none' }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                            <XAxis
+                                dataKey="name"
+                                stroke={tickColor}
+                                tickLine={false}
+                                axisLine={{ stroke: axisColor }}
+                                interval={0}
+                                height={40}
+                                tick={
+                                    <TickComBandeira
+                                        bandeirasMensais={bandeirasMensais}
+                                        onToggleBandeira={onToggleBandeira}
+                                        orientation="x"
+                                    />
+                                }
+                            />
+                            <YAxis
+                                stroke={tickColor}
+                                tickLine={false}
+                                axisLine={{ stroke: axisColor }}
+                                fontSize={12}
+                                tickFormatter={formatYAxisTick}
+                                domain={valueDomain}
+                            />
+                            {tooltipNode}
+                            {visualizacaoComparativa ? (
+                                <>
+                                    {/* Maior — Sem SolarGrid (custo alto, em vermelho) */}
+                                    <Bar
+                                        dataKey="semSolarGrid"
+                                        name="Sem SolarGrid"
+                                        fill={COR_SEM_SG}
+                                        radius={[4, 4, 0, 0]}
+                                        animationDuration={500}
+                                    />
+                                    {/* Menor — Com SolarGrid (custo reduzido, ao lado) */}
+                                    <Bar
+                                        dataKey="comSolarGrid"
+                                        name="Com SolarGrid"
+                                        fill={COR_COM_SG}
+                                        radius={[4, 4, 0, 0]}
+                                        animationDuration={500}
+                                    />
+                                </>
+                            ) : (
+                                <Bar dataKey="economia" name="Economia" fill={COR_ECONOMIA} radius={[6, 6, 0, 0]} animationDuration={500} />
+                            )}
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+        );
+    }
+
+    // MOBILE / TABLET (<lg) — barras horizontais, meses no YAxis
     return (
         <div>
-            <div className="flex items-center gap-2 mb-6">
-                <BarChart3 className="w-5 h-5 text-solar-500" />
-                <h3 className="text-lg font-semibold text-white">Projeção Anual</h3>
-            </div>
-            <div className="h-[300px] sm:h-[360px] md:h-[400px] w-full">
+            {titleNode}
+            <div style={{ height: containerHeight }} className="w-full">
                 <ResponsiveContainer width="100%" height="100%" className="focus:outline-none" style={{ outline: 'none' }}>
                     <BarChart
-                        data={chartDisplayData}
-                        margin={{ top: 8, right: 8, bottom: 16, left: 8 }}
+                        data={dadosEnriquecidos}
+                        layout="vertical"
+                        margin={{ top: 8, right: 16, bottom: 16, left: 4 }}
+                        barCategoryGap={visualizacaoComparativa ? '20%' : '14%'}
+                        barGap={3}
                         className="focus:outline-none"
                         style={{ outline: 'none' }}
                     >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
                         <XAxis
-                            dataKey="name"
-                            stroke="#9ca3af"
+                            type="number"
+                            stroke={tickColor}
                             tickLine={false}
-                            axisLine={{ stroke: '#374151' }}
-                            interval={0}
-                            tick={<TickComBandeira bandeirasMensais={bandeirasMensais} onToggleBandeira={onToggleBandeira} />}
-                            height={40}
+                            axisLine={{ stroke: axisColor }}
+                            fontSize={11}
+                            tickFormatter={formatYAxisTick}
+                            domain={valueDomain}
                         />
                         <YAxis
-                            stroke="#9ca3af"
+                            type="category"
+                            dataKey="name"
+                            stroke={tickColor}
                             tickLine={false}
-                            axisLine={{ stroke: '#374151' }}
-                            fontSize={12}
-                            tickFormatter={formatYAxisTick}
-                            domain={yAxisDomain}
+                            axisLine={{ stroke: axisColor }}
+                            interval={0}
+                            width={60}
+                            tick={
+                                <TickComBandeira
+                                    bandeirasMensais={bandeirasMensais}
+                                    onToggleBandeira={onToggleBandeira}
+                                    orientation="y"
+                                />
+                            }
                         />
-                        <Tooltip content={<TooltipMes />} cursor={{ fill: '#1f2937', opacity: 0.4 }} />
-                        <Bar dataKey="displayValue" name="Com SolarGrid" shape={<CustomBarShape />} animationDuration={600} />
+                        {tooltipNode}
+                        {visualizacaoComparativa ? (
+                            <>
+                                {/* Maior — Sem SolarGrid (custo alto, em vermelho) */}
+                                <Bar
+                                    dataKey="semSolarGrid"
+                                    name="Sem SolarGrid"
+                                    fill={COR_SEM_SG}
+                                    radius={[0, 4, 4, 0]}
+                                    animationDuration={500}
+                                />
+                                {/* Menor — Com SolarGrid (custo reduzido, abaixo) */}
+                                <Bar
+                                    dataKey="comSolarGrid"
+                                    name="Com SolarGrid"
+                                    fill={COR_COM_SG}
+                                    radius={[0, 4, 4, 0]}
+                                    animationDuration={500}
+                                />
+                            </>
+                        ) : (
+                            <Bar dataKey="economia" name="Economia" fill={COR_ECONOMIA} radius={[0, 6, 6, 0]} animationDuration={500} />
+                        )}
                     </BarChart>
                 </ResponsiveContainer>
             </div>
@@ -286,21 +535,25 @@ function RodapeProjecao({ economiaAnualTotal, custoTotalSemSG, custoTotalComSG }
     custoTotalComSG: number;
 }) {
     return (
-        <div className="bg-gray-950/40 p-6 sm:p-8 border-t border-gray-800 text-center relative overflow-hidden">
+        <div className="bg-gray-950/40 p-5 sm:p-6 lg:p-8 border-t border-gray-800 text-center relative overflow-hidden">
             <div className="absolute -bottom-4 -right-4 opacity-[0.07] pointer-events-none">
                 <TrendingDown className="w-32 h-32 text-emerald-500" />
             </div>
             <div className="relative z-10">
-                <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-emerald-500 font-semibold mb-3">
+                <p className="text-[10px] sm:text-xs lg:text-sm uppercase tracking-[0.2em] text-emerald-500 font-semibold mb-2 sm:mb-3">
                     Economia Total Estimada no Ano
                 </p>
-                <p className="text-4xl sm:text-5xl lg:text-6xl font-bold text-emerald-400 tabular-nums mb-4">
+                <p className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-emerald-400 tabular-nums mb-3 sm:mb-4">
                     {formatCurrency(economiaAnualTotal)}
                 </p>
-                <p className="text-xs sm:text-sm text-gray-500">
-                    Custo total sem a SolarGrid: <span className="text-gray-300 font-medium">{formatCurrency(custoTotalSemSG)}</span>
-                    <span className="mx-2 text-gray-700">|</span>
-                    Custo total com a SolarGrid: <span className="text-solar-400 font-medium">{formatCurrency(custoTotalComSG)}</span>
+                <p className="text-[11px] sm:text-xs lg:text-sm text-gray-500 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-0">
+                    <span>
+                        Custo total sem a SolarGrid: <span className="text-gray-300 font-medium">{formatCurrency(custoTotalSemSG)}</span>
+                    </span>
+                    <span className="hidden sm:inline mx-2 text-gray-700">|</span>
+                    <span>
+                        Custo total com a SolarGrid: <span className="text-solar-400 font-medium">{formatCurrency(custoTotalComSG)}</span>
+                    </span>
                 </p>
             </div>
         </div>
@@ -408,8 +661,32 @@ function PopoverBandeiras({
                 </div>
 
                 <div className="mb-6">
+                    <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">1. Selecione a Bandeira</p>
+                    <div className="flex flex-wrap gap-2">
+                        {todasBandeiras.map((bandeira) => {
+                            const ativa = bandeiraSelecionadaTemp === bandeira;
+                            const cor = CORES_BANDEIRAS[bandeira];
+                            return (
+                                <button
+                                    key={bandeira}
+                                    type="button"
+                                    aria-pressed={ativa}
+                                    onClick={() => onChangeBandeiraTemp(bandeira)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 bg-gray-800 ring-1 ${
+                                        ativa ? 'ring-2 ring-white text-white' : 'ring-gray-700 text-gray-300 hover:bg-gray-700'
+                                    }`}
+                                >
+                                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: cor }} />
+                                    {bandeira}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="mb-6">
                     <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs uppercase tracking-widest text-gray-500">1. Selecione os Meses</p>
+                        <p className="text-xs uppercase tracking-widest text-gray-500">2. Aplique aos Meses</p>
                         <button
                             type="button"
                             onClick={toggleTodos}
@@ -439,30 +716,6 @@ function PopoverBandeiras({
                                         className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full"
                                         style={{ background: corBandeiraAtual }}
                                     />
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                <div className="mb-6">
-                    <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">2. Aplicar Bandeira</p>
-                    <div className="flex flex-wrap gap-2">
-                        {todasBandeiras.map((bandeira) => {
-                            const ativa = bandeiraSelecionadaTemp === bandeira;
-                            const cor = CORES_BANDEIRAS[bandeira];
-                            return (
-                                <button
-                                    key={bandeira}
-                                    type="button"
-                                    aria-pressed={ativa}
-                                    onClick={() => onChangeBandeiraTemp(bandeira)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 bg-gray-800 ring-1 ${
-                                        ativa ? 'ring-2 ring-white text-white' : 'ring-gray-700 text-gray-300 hover:bg-gray-700'
-                                    }`}
-                                >
-                                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: cor }} />
-                                    {bandeira}
                                 </button>
                             );
                         })}
@@ -505,6 +758,7 @@ function App() {
   const [isMenuBandeirasOpen, setIsMenuBandeirasOpen] = useState<boolean>(false);
   const [mesesSelecionados, setMesesSelecionados] = useState<number[]>([]);
   const [bandeiraSelecionadaTemp, setBandeiraSelecionadaTemp] = useState<NomeBandeira>('Verde');
+  const [visualizacaoComparativa, setVisualizacaoComparativa] = useState<boolean>(false);
 
   const triggerPopoverRef = useRef<HTMLButtonElement>(null);
 
@@ -810,23 +1064,34 @@ function App() {
 
         {resultado && projecao && !erro && (
           <section className="mt-8 animate-fade-up bg-gray-900 rounded-3xl ring-1 ring-white/10 shadow-xl overflow-hidden">
-            <div className="p-6 sm:p-8 border-b border-gray-800">
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="p-4 lg:p-6 border-b border-gray-800">
+              <div className="flex flex-wrap items-start gap-x-6 gap-y-4 lg:items-center lg:justify-between">
                 <BotoesPromocao promocaoAtiva={promocaoAtiva} onSelect={setPromocaoAtiva} />
-                <button
-                  ref={triggerPopoverRef}
-                  type="button"
-                  onClick={() => setIsMenuBandeirasOpen(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gray-800 text-gray-200 ring-1 ring-gray-700 hover:bg-gray-700 hover:text-white transition-all duration-200 self-start lg:self-auto"
-                >
-                  <Pencil className="w-4 h-4" />
-                  Personalizar Bandeiras
-                </button>
+                <div className="flex flex-wrap items-center gap-2 lg:gap-3">
+                  <SwitchComparativo
+                    ativo={visualizacaoComparativa}
+                    onChange={setVisualizacaoComparativa}
+                  />
+                  <button
+                    ref={triggerPopoverRef}
+                    type="button"
+                    onClick={() => setIsMenuBandeirasOpen(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gray-800 text-gray-200 ring-1 ring-gray-700 hover:bg-gray-700 hover:text-white transition-all duration-200"
+                  >
+                    <Pencil className="w-4 h-4" />
+                    Personalizar Bandeiras
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="p-6 sm:p-8">
-              <GraficoProjecao dados={projecao.dadosGrafico} bandeirasMensais={bandeirasMensais} onToggleBandeira={handleToggleBandeiraMes} />
+            <div className="p-4 lg:p-6">
+              <GraficoProjecao
+                dados={projecao.dadosGrafico}
+                bandeirasMensais={bandeirasMensais}
+                onToggleBandeira={handleToggleBandeiraMes}
+                visualizacaoComparativa={visualizacaoComparativa}
+              />
             </div>
 
             <RodapeProjecao

@@ -26,7 +26,9 @@
       "Bash(Get-Content \"C:\\\\Users\\\\DANIEL~1.LEI\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-daniel-leiner-solarg-Desktop-calculadorasg-next\\\\01bc924d-422d-4184-800a-d28c7046f54f\\\\tasks\\\\b31jmvqxr.output\")",
       "Bash(echo \"tsc: $?\")",
       "Bash(echo \"lint: $?\")",
-      "Bash(echo \"build exit: $?\")"
+      "Bash(echo \"build exit: $?\")",
+      "Skill(using-superpowers)",
+      "PowerShell(npx --no-install tsc --noEmit -p . 2>&1 | Select-Object -First 30)"
     ]
   }
 }
