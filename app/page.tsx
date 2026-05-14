@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { distribuidorasData } from '../src/core/data';
 import { simularComercial } from '../src/core/calculator';
 import type { SimulacaoComercial } from '../src/core/types';
@@ -21,32 +21,30 @@ function App() {
 
   const distribuidoras = Object.keys(distribuidorasData).sort();
 
-  const [resultado, setResultado] = useState<SimulacaoComercial | null>(null);
-  const [erro, setErro] = useState<string | null>(null);
 
-  useEffect(() => {
+  const { resultado, erro } = useMemo<{
+    resultado: SimulacaoComercial | null;
+    erro: string | null;
+  }>(() => {
+    const numDesconto = Number(desconto);
+    const numConsumo = Number(consumo);
+
+    if (isNaN(numDesconto) || isNaN(numConsumo) || numConsumo <= 0 || numDesconto < 0) {
+      return { resultado: null, erro: 'Preencha um consumo e desconto válidos.' };
+    }
+
+    if (numConsumo <= consumoMinimo) {
+      return { resultado: null, erro: 'O consumo total deve ser maior que o consumo mínimo da conexão.' };
+    }
+
     try {
-      const numDesconto = Number(desconto);
-      const numConsumo = Number(consumo);
-
-      if (isNaN(numDesconto) || isNaN(numConsumo) || numConsumo <= 0 || numDesconto < 0) {
-        setResultado(null);
-        setErro('Preencha um consumo e desconto válidos.');
-        return;
-      }
-
-      if (numConsumo <= consumoMinimo) {
-        setResultado(null);
-        setErro('O consumo total deve ser maior que o consumo mínimo da conexão.');
-        return;
-      }
-
       const res = simularComercial(distribuidora, numDesconto, numConsumo, consumoMinimo);
-      setResultado(res);
-      setErro(null);
+      return { resultado: res, erro: null };
     } catch (err: unknown) {
-      setResultado(null);
-      setErro(err instanceof Error ? err.message : 'Erro ao processar simulação.');
+      return {
+        resultado: null,
+        erro: err instanceof Error ? err.message : 'Erro ao processar simulação.',
+      };
     }
   }, [distribuidora, desconto, consumo, consumoMinimo]);
 
