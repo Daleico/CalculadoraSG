@@ -23,3 +23,10 @@ export const bandeirasTarifarias: Record<NomeBandeira, number> = {
     "Vermelha P1": 44.63,
     "Vermelha P2": 78.77
 };
+
+export const BANDEIRAS_PADRAO: readonly NomeBandeira[] = [
+    'Verde', 'Verde', 'Verde', 'Verde', 'Verde', 'Verde',
+    'Amarela', 'Amarela', 'Amarela',
+    'Vermelha P1', 'Vermelha P1',
+    'Vermelha P2',
+];
