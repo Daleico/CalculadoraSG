@@ -322,7 +322,7 @@ function App() {
           {/* Results Section */}
           <div className="lg:col-span-8">
             {resultado && !erro ? (
-              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="space-y-8 animate-fade-up">
 
                 {/* Destaques (Bandeira Verde) */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -442,7 +442,7 @@ function App() {
         </div>
 
         {resultado && projecao && !erro && (
-          <section className="mt-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <section className="mt-8 space-y-6 animate-fade-up">
             <BarraControles
               cenario100Verde={cenario100Verde}
               onToggleCenario={setCenario100Verde}
