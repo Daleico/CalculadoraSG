@@ -383,6 +383,7 @@ function App() {
 
   const handleClosePopover = useCallback(() => {
     setMesesSelecionados([]);
+    setBandeiraSelecionadaTemp('Verde');
     setIsMenuBandeirasOpen(false);
     requestAnimationFrame(() => triggerPopoverRef.current?.focus());
   }, []);
@@ -394,6 +395,7 @@ function App() {
       return next;
     });
     setMesesSelecionados([]);
+    setBandeiraSelecionadaTemp('Verde');
     setIsMenuBandeirasOpen(false);
     requestAnimationFrame(() => triggerPopoverRef.current?.focus());
   }, []);
