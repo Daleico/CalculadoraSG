@@ -243,7 +243,8 @@ function TickComBandeira(props: {
 }) {
     const { x = 0, y = 0, payload, bandeirasMensais, onToggleBandeira, orientation = 'x' } = props;
     if (!payload) return null;
-    const cor = CORES_BANDEIRAS[bandeirasMensais[payload.index]];
+    const bandeira = bandeirasMensais[payload.index];
+    const cor = bandeira ? CORES_BANDEIRAS[bandeira] : '#9ca3af';
 
     if (orientation === 'y') {
         return (
@@ -334,7 +335,7 @@ function GraficoProjecao({
     // Visão comparativa (overlay): a barra mais alta sempre é semSolarGrid
     const comparativoDomain = useMemo<[number, number]>(() => {
         const max = Math.max(...dados.map((d) => d.semSolarGrid));
-        return [0, max * 1.08];
+        return [0, Math.max(1, max * 1.08)];
     }, [dados]);
 
     const valueDomain = visualizacaoComparativa ? comparativoDomain : economiaDomain;
