@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo } from 'react';
-import { distribuidorasData } from '../src/core/data';
+import { useState, useMemo, useEffect } from 'react';
+import { distribuidorasData, BANDEIRAS_PADRAO } from '../src/core/data';
+import type { NomeBandeira } from '../src/core/data';
 import { simularComercial, calcularProjecaoAnual } from '../src/core/calculator';
 import type { SimulacaoComercial, PromocaoComercial, ProjecaoAnual } from '../src/core/types';
-import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator, BarChart3, Sparkles } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator, BarChart3, Pencil, X } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -173,8 +174,11 @@ function App() {
   const [desconto, setDesconto] = useState<number | string>(15);
   const [consumo, setConsumo] = useState<number | string>(1000);
   const [consumoMinimo, setConsumoMinimo] = useState<number>(30);
-  const [cenario100Verde, setCenario100Verde] = useState<boolean>(false);
+  const [bandeirasMensais, setBandeirasMensais] = useState<readonly NomeBandeira[]>(BANDEIRAS_PADRAO);
   const [promocaoAtiva, setPromocaoAtiva] = useState<PromocaoComercial>('NENHUMA');
+  const [isMenuBandeirasOpen, setIsMenuBandeirasOpen] = useState<boolean>(false);
+  const [mesesSelecionados, setMesesSelecionados] = useState<number[]>([]);
+  const [bandeiraSelecionadaTemp, setBandeiraSelecionadaTemp] = useState<NomeBandeira>('Verde');
 
   const distribuidoras = Object.keys(distribuidorasData).sort();
 
@@ -202,7 +206,7 @@ function App() {
         consumoKwh: numConsumo,
         descontoPercentual: numDesconto,
         consumoMinimo,
-        cenario100Verde,
+        bandeirasMensais,
         promocaoAtiva,
       });
       return { resultado, projecao, erro: null };
@@ -213,7 +217,7 @@ function App() {
         erro: err instanceof Error ? err.message : 'Erro ao processar simulação.',
       };
     }
-  }, [distribuidora, desconto, consumo, consumoMinimo, cenario100Verde, promocaoAtiva]);
+  }, [distribuidora, desconto, consumo, consumoMinimo, bandeirasMensais, promocaoAtiva]);
 
   const getBandeiraColor = (nome: string) => {
     if (nome.includes('Verde')) return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
