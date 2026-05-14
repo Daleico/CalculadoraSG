@@ -4,13 +4,162 @@ import { useState, useMemo } from 'react';
 import { distribuidorasData } from '../src/core/data';
 import { simularComercial, calcularProjecaoAnual } from '../src/core/calculator';
 import type { SimulacaoComercial, PromocaoComercial, ProjecaoAnual } from '../src/core/types';
-import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator } from 'lucide-react';
+import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator, BarChart3, Sparkles } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
   }).format(value);
+}
+
+function BarraControles({
+    cenario100Verde,
+    onToggleCenario,
+    promocaoAtiva,
+    onSelectPromocao,
+}: {
+    cenario100Verde: boolean;
+    onToggleCenario: (v: boolean) => void;
+    promocaoAtiva: PromocaoComercial;
+    onSelectPromocao: (p: PromocaoComercial) => void;
+}) {
+    const promocoes: Array<{ valor: PromocaoComercial; label: string }> = [
+        { valor: 'NENHUMA', label: 'Nenhuma' },
+        { valor: '1_GRATIS', label: '1º Mês Grátis' },
+        { valor: '2_GRATIS', label: '2 Meses Grátis' },
+        { valor: '50_OFF', label: '50% OFF no 1º' },
+    ];
+
+    return (
+        <div className="bg-gray-900 rounded-3xl shadow-xl ring-1 ring-white/10 p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-gray-800">
+                <div className="flex items-center gap-3">
+                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                    <span className="text-sm font-medium text-gray-300">Cenário 100% Bandeira Verde</span>
+                </div>
+                <button
+                    type="button"
+                    role="switch"
+                    aria-checked={cenario100Verde}
+                    onClick={() => onToggleCenario(!cenario100Verde)}
+                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${cenario100Verde ? 'bg-emerald-500' : 'bg-gray-700'}`}
+                >
+                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 ${cenario100Verde ? 'translate-x-6' : 'translate-x-1'}`} />
+                </button>
+            </div>
+
+            <div className="pt-5">
+                <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Gatilho Comercial</p>
+                <div className="flex flex-wrap gap-2">
+                    {promocoes.map(({ valor, label }) => {
+                        const ativo = promocaoAtiva === valor;
+                        return (
+                            <button
+                                key={valor}
+                                type="button"
+                                onClick={() => onSelectPromocao(valor)}
+                                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                    ativo
+                                        ? 'bg-solar-500 text-gray-950 ring-2 ring-solar-400 shadow-lg shadow-solar-500/20'
+                                        : 'bg-gray-800 text-gray-400 ring-1 ring-gray-700 hover:bg-gray-700 hover:text-gray-200'
+                                }`}
+                            >
+                                {label}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+type PontoMes = ProjecaoAnual['dadosGrafico'][number];
+
+function TooltipMes({ active, payload }: { active?: boolean; payload?: Array<{ payload: PontoMes }> }) {
+    if (!active || !payload || payload.length === 0) return null;
+    const ponto = payload[0].payload;
+
+    return (
+        <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 shadow-2xl min-w-[200px]">
+            <p className="text-sm font-semibold text-white mb-3">{ponto.name}</p>
+            <div className="space-y-1.5 text-xs">
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Sem SolarGrid</span>
+                    <span className="text-gray-200 font-medium">{formatCurrency(ponto.semSolarGrid)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Com SolarGrid</span>
+                    <span className="text-solar-400 font-medium">{formatCurrency(ponto.comSolarGrid)}</span>
+                </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-800 flex justify-between items-center">
+                <span className="text-xs uppercase tracking-wider text-emerald-500">Economia</span>
+                <span className="text-base font-bold text-emerald-400">{formatCurrency(ponto.economia)}</span>
+            </div>
+        </div>
+    );
+}
+
+function GraficoProjecao({ dados }: { dados: ProjecaoAnual['dadosGrafico'] }) {
+    return (
+        <div className="bg-gray-900 rounded-3xl shadow-xl ring-1 ring-white/10 p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-6">
+                <BarChart3 className="w-5 h-5 text-solar-500" />
+                <h3 className="text-lg font-semibold text-white">Projeção Anual</h3>
+            </div>
+            <div className="h-[360px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                        data={dados}
+                        barGap={4}
+                        barCategoryGap="20%"
+                        margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
+                        <XAxis
+                            dataKey="name"
+                            stroke="#9ca3af"
+                            tickLine={false}
+                            axisLine={{ stroke: '#374151' }}
+                            fontSize={12}
+                        />
+                        <YAxis
+                            stroke="#9ca3af"
+                            tickLine={false}
+                            axisLine={{ stroke: '#374151' }}
+                            fontSize={12}
+                            tickFormatter={(v: number) => `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`}
+                        />
+                        <Tooltip content={<TooltipMes />} cursor={{ fill: '#1f2937', opacity: 0.4 }} />
+                        <Legend wrapperStyle={{ paddingTop: 12 }} iconType="circle" />
+                        <Bar dataKey="semSolarGrid" name="Sem SolarGrid" fill="#475569" radius={[6, 6, 0, 0]} animationDuration={600} />
+                        <Bar dataKey="comSolarGrid" name="Com SolarGrid" fill="#f59e0b" radius={[6, 6, 0, 0]} animationDuration={600} />
+                    </BarChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+    );
+}
+
+function CardEconomiaAnual({ valor }: { valor: number }) {
+    return (
+        <div className="bg-gradient-to-br from-emerald-950/40 to-gray-900 rounded-3xl p-8 sm:p-10 ring-1 ring-emerald-500/30 shadow-xl relative overflow-hidden">
+            <div className="absolute -bottom-4 -right-4 opacity-10 pointer-events-none">
+                <TrendingDown className="w-32 h-32 text-emerald-500" />
+            </div>
+            <div className="relative z-10 text-center">
+                <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-emerald-500 mb-3 font-semibold">
+                    Economia Total Estimada no Ano
+                </p>
+                <p className="text-4xl sm:text-5xl lg:text-6xl font-bold text-emerald-400 tabular-nums">
+                    {formatCurrency(valor)}
+                </p>
+            </div>
+        </div>
+    );
 }
 
 function App() {
