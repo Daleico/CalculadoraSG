@@ -60,6 +60,7 @@ function BarraControles({
                             <button
                                 key={valor}
                                 type="button"
+                                aria-pressed={ativo}
                                 onClick={() => onSelectPromocao(valor)}
                                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                                     ativo
