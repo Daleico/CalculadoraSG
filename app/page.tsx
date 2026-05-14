@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import { distribuidorasData } from '../src/core/data';
-import { simularComercial } from '../src/core/calculator';
-import type { SimulacaoComercial } from '../src/core/types';
+import { simularComercial, calcularProjecaoAnual } from '../src/core/calculator';
+import type { SimulacaoComercial, PromocaoComercial, ProjecaoAnual } from '../src/core/types';
 import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator } from 'lucide-react';
 
 function formatCurrency(value: number): string {
@@ -18,35 +18,47 @@ function App() {
   const [desconto, setDesconto] = useState<number | string>(15);
   const [consumo, setConsumo] = useState<number | string>(1000);
   const [consumoMinimo, setConsumoMinimo] = useState<number>(30);
+  const [cenario100Verde, setCenario100Verde] = useState<boolean>(false);
+  const [promocaoAtiva, setPromocaoAtiva] = useState<PromocaoComercial>('NENHUMA');
 
   const distribuidoras = Object.keys(distribuidorasData).sort();
 
 
-  const { resultado, erro } = useMemo<{
+  const { resultado, projecao, erro } = useMemo<{
     resultado: SimulacaoComercial | null;
+    projecao: ProjecaoAnual | null;
     erro: string | null;
   }>(() => {
     const numDesconto = Number(desconto);
     const numConsumo = Number(consumo);
 
     if (isNaN(numDesconto) || isNaN(numConsumo) || numConsumo <= 0 || numDesconto < 0) {
-      return { resultado: null, erro: 'Preencha um consumo e desconto válidos.' };
+      return { resultado: null, projecao: null, erro: 'Preencha um consumo e desconto válidos.' };
     }
 
     if (numConsumo <= consumoMinimo) {
-      return { resultado: null, erro: 'O consumo total deve ser maior que o consumo mínimo da conexão.' };
+      return { resultado: null, projecao: null, erro: 'O consumo total deve ser maior que o consumo mínimo da conexão.' };
     }
 
     try {
-      const res = simularComercial(distribuidora, numDesconto, numConsumo, consumoMinimo);
-      return { resultado: res, erro: null };
+      const resultado = simularComercial(distribuidora, numDesconto, numConsumo, consumoMinimo);
+      const projecao = calcularProjecaoAnual({
+        distribuidora,
+        consumoKwh: numConsumo,
+        descontoPercentual: numDesconto,
+        consumoMinimo,
+        cenario100Verde,
+        promocaoAtiva,
+      });
+      return { resultado, projecao, erro: null };
     } catch (err: unknown) {
       return {
         resultado: null,
+        projecao: null,
         erro: err instanceof Error ? err.message : 'Erro ao processar simulação.',
       };
     }
-  }, [distribuidora, desconto, consumo, consumoMinimo]);
+  }, [distribuidora, desconto, consumo, consumoMinimo, cenario100Verde, promocaoAtiva]);
 
   const getBandeiraColor = (nome: string) => {
     if (nome.includes('Verde')) return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
