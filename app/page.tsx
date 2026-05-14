@@ -19,69 +19,6 @@ function formatYAxisTick(v: number): string {
   return `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`;
 }
 
-function BarraControles({
-    cenario100Verde,
-    onToggleCenario,
-    promocaoAtiva,
-    onSelectPromocao,
-}: {
-    cenario100Verde: boolean;
-    onToggleCenario: (v: boolean) => void;
-    promocaoAtiva: PromocaoComercial;
-    onSelectPromocao: (p: PromocaoComercial) => void;
-}) {
-    const promocoes: Array<{ valor: PromocaoComercial; label: string }> = [
-        { valor: 'NENHUMA', label: 'Nenhuma' },
-        { valor: '1_GRATIS', label: '1º Mês Grátis' },
-        { valor: '2_GRATIS', label: '2 Meses Grátis' },
-        { valor: '50_OFF', label: '50% OFF no 1º' },
-    ];
-
-    return (
-        <div className="bg-gray-900 rounded-3xl shadow-xl ring-1 ring-white/10 p-6 sm:p-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-gray-800">
-                <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm font-medium text-gray-300">Cenário 100% Bandeira Verde</span>
-                </div>
-                <button
-                    type="button"
-                    role="switch"
-                    aria-checked={cenario100Verde}
-                    aria-label="Ativar Cenário 100% Bandeira Verde"
-                    onClick={() => onToggleCenario(!cenario100Verde)}
-                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${cenario100Verde ? 'bg-emerald-500' : 'bg-gray-700'}`}
-                >
-                    <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 ${cenario100Verde ? 'translate-x-6' : 'translate-x-1'}`} />
-                </button>
-            </div>
-
-            <div className="pt-5">
-                <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Gatilho Comercial</p>
-                <div className="flex flex-wrap gap-2">
-                    {promocoes.map(({ valor, label }) => {
-                        const ativo = promocaoAtiva === valor;
-                        return (
-                            <button
-                                key={valor}
-                                type="button"
-                                aria-pressed={ativo}
-                                onClick={() => onSelectPromocao(valor)}
-                                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                                    ativo
-                                        ? 'bg-solar-500 text-gray-950 ring-2 ring-solar-400 shadow-lg shadow-solar-500/20'
-                                        : 'bg-gray-800 text-gray-400 ring-1 ring-gray-700 hover:bg-gray-700 hover:text-gray-200'
-                                }`}
-                            >
-                                {label}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-        </div>
-    );
-}
 
 type PontoMes = ProjecaoAnual['dadosGrafico'][number];
 
@@ -110,20 +47,85 @@ function TooltipMes({ active, payload }: { active?: boolean; payload?: Array<{ p
     );
 }
 
-function GraficoProjecao({ dados }: { dados: ProjecaoAnual['dadosGrafico'] }) {
+function BotoesPromocao({ promocaoAtiva, onSelect }: {
+    promocaoAtiva: PromocaoComercial;
+    onSelect: (p: PromocaoComercial) => void;
+}) {
+    const promocoes: Array<{ valor: PromocaoComercial; label: string }> = [
+        { valor: 'NENHUMA', label: 'Nenhuma' },
+        { valor: '1_GRATIS', label: '1º Mês Grátis' },
+        { valor: '2_GRATIS', label: '2 Meses Grátis' },
+        { valor: '50_OFF', label: '50% OFF no 1º' },
+    ];
+
     return (
-        <div className="bg-gray-900 rounded-3xl shadow-xl ring-1 ring-white/10 p-6 sm:p-8">
+        <div className="flex flex-col gap-2">
+            <p className="text-xs uppercase tracking-widest text-gray-500">Gatilho Comercial</p>
+            <div className="flex flex-wrap gap-2">
+                {promocoes.map(({ valor, label }) => {
+                    const ativo = promocaoAtiva === valor;
+                    return (
+                        <button
+                            key={valor}
+                            type="button"
+                            aria-pressed={ativo}
+                            onClick={() => onSelect(valor)}
+                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                ativo
+                                    ? 'bg-solar-500 text-gray-950 ring-2 ring-solar-400 shadow-lg shadow-solar-500/20'
+                                    : 'bg-gray-800 text-gray-400 ring-1 ring-gray-700 hover:bg-gray-700 hover:text-gray-200'
+                            }`}
+                        >
+                            {label}
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
+const CORES_BANDEIRAS: Record<NomeBandeira, string> = {
+    'Verde': '#10b981',
+    'Amarela': '#eab308',
+    'Vermelha P1': '#f97316',
+    'Vermelha P2': '#ef4444',
+};
+
+function TickComBandeira(props: {
+    x?: number;
+    y?: number;
+    payload?: { value: string; index: number };
+    bandeirasMensais: readonly NomeBandeira[];
+}) {
+    const { x = 0, y = 0, payload, bandeirasMensais } = props;
+    if (!payload) return null;
+    const cor = CORES_BANDEIRAS[bandeirasMensais[payload.index]];
+    return (
+        <g transform={`translate(${x},${y})`}>
+            <text x={0} y={0} dy={12} textAnchor="middle" fill="#9ca3af" fontSize={12}>
+                {payload.value}
+            </text>
+            <circle cx={0} cy={22} r={3} fill={cor} />
+        </g>
+    );
+}
+
+function GraficoProjecao({ dados, bandeirasMensais }: {
+    dados: ProjecaoAnual['dadosGrafico'];
+    bandeirasMensais: readonly NomeBandeira[];
+}) {
+    return (
+        <div>
             <div className="flex items-center gap-2 mb-6">
                 <BarChart3 className="w-5 h-5 text-solar-500" />
                 <h3 className="text-lg font-semibold text-white">Projeção Anual</h3>
             </div>
-            <div className="h-[280px] sm:h-[340px] md:h-[360px] w-full">
+            <div className="h-[300px] sm:h-[360px] md:h-[400px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={dados}
-                        barGap={4}
-                        barCategoryGap="20%"
-                        margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+                        margin={{ top: 8, right: 8, bottom: 16, left: 8 }}
                     >
                         <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
                         <XAxis
@@ -131,7 +133,9 @@ function GraficoProjecao({ dados }: { dados: ProjecaoAnual['dadosGrafico'] }) {
                             stroke="#9ca3af"
                             tickLine={false}
                             axisLine={{ stroke: '#374151' }}
-                            fontSize={12}
+                            interval={0}
+                            tick={<TickComBandeira bandeirasMensais={bandeirasMensais} />}
+                            height={40}
                         />
                         <YAxis
                             stroke="#9ca3af"
@@ -141,9 +145,7 @@ function GraficoProjecao({ dados }: { dados: ProjecaoAnual['dadosGrafico'] }) {
                             tickFormatter={formatYAxisTick}
                         />
                         <Tooltip content={<TooltipMes />} cursor={{ fill: '#1f2937', opacity: 0.4 }} />
-                        <Legend wrapperStyle={{ paddingTop: 12 }} iconType="circle" />
-                        <Bar dataKey="semSolarGrid" name="Sem SolarGrid" fill="#475569" radius={[6, 6, 0, 0]} animationDuration={600} />
-                        <Bar dataKey="comSolarGrid" name="Com SolarGrid" fill="#f59e0b" radius={[6, 6, 0, 0]} animationDuration={600} />
+                        <Bar dataKey="comSolarGrid" name="Com SolarGrid" fill="#f59e0b" radius={[4, 4, 0, 0]} animationDuration={600} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
@@ -151,19 +153,178 @@ function GraficoProjecao({ dados }: { dados: ProjecaoAnual['dadosGrafico'] }) {
     );
 }
 
-function CardEconomiaAnual({ valor }: { valor: number }) {
+function RodapeProjecao({ economiaAnualTotal, custoTotalSemSG, custoTotalComSG }: {
+    economiaAnualTotal: number;
+    custoTotalSemSG: number;
+    custoTotalComSG: number;
+}) {
     return (
-        <div className="bg-gradient-to-br from-emerald-950/40 to-gray-900 rounded-3xl p-8 sm:p-10 ring-1 ring-emerald-500/30 shadow-xl relative overflow-hidden">
-            <div className="absolute -bottom-4 -right-4 opacity-10 pointer-events-none">
+        <div className="bg-gray-950/40 p-6 sm:p-8 border-t border-gray-800 text-center relative overflow-hidden">
+            <div className="absolute -bottom-4 -right-4 opacity-[0.07] pointer-events-none">
                 <TrendingDown className="w-32 h-32 text-emerald-500" />
             </div>
-            <div className="relative z-10 text-center">
-                <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-emerald-500 mb-3 font-semibold">
+            <div className="relative z-10">
+                <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-emerald-500 font-semibold mb-3">
                     Economia Total Estimada no Ano
                 </p>
-                <p className="text-4xl sm:text-5xl lg:text-6xl font-bold text-emerald-400 tabular-nums">
-                    {formatCurrency(valor)}
+                <p className="text-4xl sm:text-5xl lg:text-6xl font-bold text-emerald-400 tabular-nums mb-4">
+                    {formatCurrency(economiaAnualTotal)}
                 </p>
+                <p className="text-xs sm:text-sm text-gray-500">
+                    Custo total sem a SolarGrid: <span className="text-gray-300 font-medium">{formatCurrency(custoTotalSemSG)}</span>
+                    <span className="mx-2 text-gray-700">|</span>
+                    Custo total com a SolarGrid: <span className="text-solar-400 font-medium">{formatCurrency(custoTotalComSG)}</span>
+                </p>
+            </div>
+        </div>
+    );
+}
+
+function PopoverBandeiras({
+    bandeirasMensais,
+    mesesSelecionados,
+    bandeiraSelecionadaTemp,
+    onChangeMesesSelecionados,
+    onChangeBandeiraTemp,
+    onAplicar,
+    onClose,
+}: {
+    bandeirasMensais: readonly NomeBandeira[];
+    mesesSelecionados: number[];
+    bandeiraSelecionadaTemp: NomeBandeira;
+    onChangeMesesSelecionados: (meses: number[]) => void;
+    onChangeBandeiraTemp: (b: NomeBandeira) => void;
+    onAplicar: (meses: number[], bandeira: NomeBandeira) => void;
+    onClose: () => void;
+}) {
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [onClose]);
+
+    const todosNomes: readonly string[] = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const todasBandeiras: readonly NomeBandeira[] = ['Verde','Amarela','Vermelha P1','Vermelha P2'];
+
+    function toggleMes(i: number) {
+        if (mesesSelecionados.includes(i)) {
+            onChangeMesesSelecionados(mesesSelecionados.filter((m) => m !== i));
+        } else {
+            onChangeMesesSelecionados([...mesesSelecionados, i]);
+        }
+    }
+
+    function toggleTodos() {
+        if (mesesSelecionados.length === 12) onChangeMesesSelecionados([]);
+        else onChangeMesesSelecionados(Array.from({ length: 12 }, (_, i) => i));
+    }
+
+    const aplicarHabilitado = mesesSelecionados.length > 0;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Personalizar bandeiras tarifárias"
+                onClick={(e) => e.stopPropagation()}
+                className="bg-gray-900 rounded-3xl shadow-2xl ring-1 ring-white/10 max-w-lg w-full p-6 sm:p-8 max-h-[90vh] overflow-y-auto"
+            >
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-semibold text-white">Personalizar Bandeiras</h3>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        aria-label="Fechar"
+                        className="text-gray-500 hover:text-white transition-colors"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                        <p className="text-xs uppercase tracking-widest text-gray-500">1. Selecione os Meses</p>
+                        <button
+                            type="button"
+                            onClick={toggleTodos}
+                            className="text-xs text-solar-400 hover:text-solar-300 transition-colors"
+                        >
+                            {mesesSelecionados.length === 12 ? 'Limpar' : 'Selecionar todos'}
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2">
+                        {todosNomes.map((nome, i) => {
+                            const ativo = mesesSelecionados.includes(i);
+                            const corBandeiraAtual = CORES_BANDEIRAS[bandeirasMensais[i]];
+                            return (
+                                <button
+                                    key={i}
+                                    type="button"
+                                    aria-pressed={ativo}
+                                    onClick={() => toggleMes(i)}
+                                    className={`relative py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                        ativo
+                                            ? 'bg-solar-500 text-gray-950 ring-2 ring-solar-400'
+                                            : 'bg-gray-800 text-gray-300 ring-1 ring-gray-700 hover:bg-gray-700'
+                                    }`}
+                                >
+                                    {nome}
+                                    <span
+                                        className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full"
+                                        style={{ background: corBandeiraAtual }}
+                                    />
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="mb-6">
+                    <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">2. Aplicar Bandeira</p>
+                    <div className="flex flex-wrap gap-2">
+                        {todasBandeiras.map((bandeira) => {
+                            const ativa = bandeiraSelecionadaTemp === bandeira;
+                            const cor = CORES_BANDEIRAS[bandeira];
+                            return (
+                                <button
+                                    key={bandeira}
+                                    type="button"
+                                    aria-pressed={ativa}
+                                    onClick={() => onChangeBandeiraTemp(bandeira)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 bg-gray-800 ring-1 ${
+                                        ativa ? 'ring-2 ring-white text-white' : 'ring-gray-700 text-gray-300 hover:bg-gray-700'
+                                    }`}
+                                >
+                                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: cor }} />
+                                    {bandeira}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-800">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="px-4 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => onAplicar(mesesSelecionados, bandeiraSelecionadaTemp)}
+                        disabled={!aplicarHabilitado}
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                            aplicarHabilitado
+                                ? 'bg-solar-500 text-gray-950 ring-2 ring-solar-400 shadow-lg shadow-solar-500/20'
+                                : 'bg-gray-800 text-gray-600 ring-1 ring-gray-800 cursor-not-allowed'
+                        }`}
+                    >
+                        Aplicar Alteração
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -450,16 +611,54 @@ function App() {
         </div>
 
         {resultado && projecao && !erro && (
-          <section className="mt-8 space-y-6 animate-fade-up">
-            <BarraControles
-              cenario100Verde={cenario100Verde}
-              onToggleCenario={setCenario100Verde}
-              promocaoAtiva={promocaoAtiva}
-              onSelectPromocao={setPromocaoAtiva}
+          <section className="mt-8 animate-fade-up bg-gray-900 rounded-3xl ring-1 ring-white/10 shadow-xl overflow-hidden">
+            <div className="p-6 sm:p-8 border-b border-gray-800">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <BotoesPromocao promocaoAtiva={promocaoAtiva} onSelect={setPromocaoAtiva} />
+                <button
+                  type="button"
+                  onClick={() => setIsMenuBandeirasOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gray-800 text-gray-200 ring-1 ring-gray-700 hover:bg-gray-700 hover:text-white transition-all duration-200 self-start lg:self-auto"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Personalizar Bandeiras
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 sm:p-8">
+              <GraficoProjecao dados={projecao.dadosGrafico} bandeirasMensais={bandeirasMensais} />
+            </div>
+
+            <RodapeProjecao
+              economiaAnualTotal={projecao.economiaAnualTotal}
+              custoTotalSemSG={projecao.custoTotalSemSG}
+              custoTotalComSG={projecao.custoTotalComSG}
             />
-            <GraficoProjecao dados={projecao.dadosGrafico} />
-            <CardEconomiaAnual valor={projecao.economiaAnualTotal} />
           </section>
+        )}
+
+        {isMenuBandeirasOpen && (
+          <PopoverBandeiras
+            bandeirasMensais={bandeirasMensais}
+            mesesSelecionados={mesesSelecionados}
+            bandeiraSelecionadaTemp={bandeiraSelecionadaTemp}
+            onChangeMesesSelecionados={setMesesSelecionados}
+            onChangeBandeiraTemp={setBandeiraSelecionadaTemp}
+            onAplicar={(meses, bandeira) => {
+              setBandeirasMensais((prev) => {
+                const next = [...prev];
+                for (const i of meses) next[i] = bandeira;
+                return next;
+              });
+              setMesesSelecionados([]);
+              setIsMenuBandeirasOpen(false);
+            }}
+            onClose={() => {
+              setMesesSelecionados([]);
+              setIsMenuBandeirasOpen(false);
+            }}
+          />
         )}
 
       </div>
