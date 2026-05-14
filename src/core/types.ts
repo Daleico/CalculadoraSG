@@ -54,4 +54,6 @@ export interface PontoGraficoMensal {
 export interface ProjecaoAnual {
     dadosGrafico: PontoGraficoMensal[];
     economiaAnualTotal: number;
+    custoTotalSemSG: number;
+    custoTotalComSG: number;
 }
