@@ -21,7 +21,7 @@ Dois arquivos modificados, uma dependência adicionada. **Zero alteração no co
 
 | Arquivo | Mudança |
 |---|---|
-| `package.json` / `package-lock.json` | Adiciona `recharts` (latest 2.x, compatível com React 19) |
+| `package.json` / `package-lock.json` | Adiciona `recharts` (latest, resolveu para 3.8.1; compatível com React 19) |
 | `app/page.tsx` | Refatora `useEffect`/`setState` em `useMemo` derivado; adiciona estados `cenario100Verde` e `promocaoAtiva`; adiciona seção full-width com BarraControles + GraficoProjecao + CardEconomiaAnual; ~3 subcomponentes locais inline |
 
 ## Decisões de Design Registradas
@@ -40,7 +40,7 @@ Dois arquivos modificados, uma dependência adicionada. **Zero alteração no co
 npm install recharts
 ```
 
-Recharts 2.13+ suporta React 19 (testado em produção pela comunidade). Latest 2.15+ recomendado.
+Recharts 3.x suporta React 19 nativamente. `npm install recharts` resolve para a major mais recente — no momento desta implementação, 3.8.1. As primitivas usadas (`BarChart`, `Bar`, `XAxis`, `YAxis`, `CartesianGrid`, `Tooltip`, `Legend`, `ResponsiveContainer`) e o pattern de `Tooltip content={<CustomComponent />}` permanecem estáveis entre v2 e v3.
 
 ### 2. Estado em `app/page.tsx`
 
