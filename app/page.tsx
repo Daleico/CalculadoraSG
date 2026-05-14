@@ -6,6 +6,13 @@ import { simularComercial } from '../src/core/calculator';
 import type { SimulacaoComercial } from '../src/core/types';
 import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator } from 'lucide-react';
 
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
+}
+
 function App() {
   const [distribuidora, setDistribuidora] = useState<string>('CEMIG');
   const [desconto, setDesconto] = useState<number | string>(15);
@@ -42,13 +49,6 @@ function App() {
       setErro(err instanceof Error ? err.message : 'Erro ao processar simulação.');
     }
   }, [distribuidora, desconto, consumo, consumoMinimo]);
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
 
   const getBandeiraColor = (nome: string) => {
     if (nome.includes('Verde')) return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
