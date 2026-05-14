@@ -14,7 +14,19 @@
       "Bash(python *)",
       "Bash(dir docs *)",
       "Bash(dir docs\\\\superpowers /B)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(npx tsx *)",
+      "Bash(echo \"---exit: $?\")",
+      "Bash(npm run *)",
+      "Bash(echo \"tsc exit: $?\")",
+      "Bash(git show *)",
+      "Bash(Start-Sleep -Seconds 15)",
+      "Bash(Get-Content \"C:\\\\Users\\\\DANIEL~1.LEI\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-daniel-leiner-solarg-Desktop-calculadorasg-next\\\\01bc924d-422d-4184-800a-d28c7046f54f\\\\tasks\\\\b31jmvqxr.output\")",
+      "Bash(echo \"tsc: $?\")",
+      "Bash(echo \"lint: $?\")",
+      "Bash(echo \"build exit: $?\")"
     ]
   }
 }

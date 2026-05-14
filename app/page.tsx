@@ -5,8 +5,8 @@ import { distribuidorasData, BANDEIRAS_PADRAO } from '../src/core/data';
 import type { NomeBandeira } from '../src/core/data';
 import { simularComercial, calcularProjecaoAnual } from '../src/core/calculator';
 import type { SimulacaoComercial, PromocaoComercial, ProjecaoAnual } from '../src/core/types';
-import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator, BarChart3, Pencil, X } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator, BarChart3, Pencil, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Rectangle } from 'recharts';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -17,6 +17,75 @@ function formatCurrency(value: number): string {
 
 function formatYAxisTick(v: number): string {
   return `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`;
+}
+
+function CustomNumberInput({
+  value,
+  onChange,
+  icon: Icon,
+  label,
+  placeholder,
+  step = 1
+}: {
+  value: number | string;
+  onChange: (val: number | string) => void;
+  icon: any;
+  label: string;
+  placeholder: string;
+  step?: number;
+}) {
+  const handleIncrement = () => {
+    const current = Number(value) || 0;
+    if (step === 1) {
+       onChange(Math.floor(current) + 1);
+    } else {
+       onChange(current + step);
+    }
+  };
+
+  const handleDecrement = () => {
+    const current = Number(value) || 0;
+    if (step === 1) {
+       onChange(Math.ceil(current) - 1);
+    } else {
+       onChange(Math.max(0, current - step));
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+        <Icon className="w-4 h-4 text-solar-500" />
+        {label}
+      </label>
+      <div className="relative flex items-center">
+        <input
+          type="number"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="custom-number-input block w-full bg-gray-950 border border-gray-800 text-white rounded-xl focus:ring-2 focus:ring-solar-500 focus:border-solar-500 p-3.5 pr-14 shadow-inner"
+          placeholder={placeholder}
+          step="any"
+        />
+        <div className="absolute right-2 flex flex-col gap-0.5">
+          <button
+            type="button"
+            onClick={handleIncrement}
+            className="flex items-center justify-center w-8 h-5 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-t-md transition-colors border border-gray-700"
+          >
+            <ChevronUp className="w-3 h-3" />
+          </button>
+          <button
+            type="button"
+            onClick={handleDecrement}
+            className="flex items-center justify-center w-8 h-5 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-b-md transition-colors border border-gray-700 border-t-0"
+          >
+            <ChevronDown className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 
@@ -97,24 +166,79 @@ function TickComBandeira(props: {
     y?: number;
     payload?: { value: string; index: number };
     bandeirasMensais: readonly NomeBandeira[];
+    onToggleBandeira?: (i: number) => void;
 }) {
-    const { x = 0, y = 0, payload, bandeirasMensais } = props;
+    const { x = 0, y = 0, payload, bandeirasMensais, onToggleBandeira } = props;
     if (!payload) return null;
     const cor = CORES_BANDEIRAS[bandeirasMensais[payload.index]];
     return (
-        <g transform={`translate(${x},${y})`}>
-            <text x={0} y={0} dy={12} textAnchor="middle" fill="#9ca3af" fontSize={12}>
+        <g 
+            transform={`translate(${x},${y})`}
+            onClick={() => onToggleBandeira?.(payload.index)}
+            style={{ cursor: onToggleBandeira ? 'pointer' : 'default' }}
+            className="group outline-none"
+        >
+            <title>Clique para alterar a bandeira</title>
+            {/* Hit area invisivel expandida para facilitar o clique */}
+            <rect x={-20} y={0} width={40} height={32} fill="transparent" />
+            <text x={0} y={0} dy={12} textAnchor="middle" fill="#9ca3af" fontSize={12} className="group-hover:text-white transition-colors">
                 {payload.value}
             </text>
-            <circle cx={0} cy={22} r={3} fill={cor} />
+            {/* Quadrado colorido (agora maior e mais visível) */}
+            <rect x={-8} y={20} width={16} height={6} rx={2} fill={cor} className="group-hover:opacity-80 transition-opacity" />
         </g>
     );
 }
 
-function GraficoProjecao({ dados, bandeirasMensais }: {
+function CustomBarShape(props: any) {
+    const { x, y, width, height, payload } = props;
+    if (!payload) return null;
+
+    if (payload.isOutlier) {
+        return (
+            <g>
+                <Rectangle x={x} y={y} width={width} height={height} fill="#10b981" fillOpacity={0.8} radius={[4, 4, 0, 0]} />
+                <line x1={x - 2} y1={y} x2={x + width + 2} y2={y} stroke="#059669" strokeWidth={2} strokeDasharray="4 2" />
+                <text x={x + width / 2} y={y - 8} textAnchor="middle" fill="#10b981" fontSize={11} fontWeight="bold">
+                    PROMO
+                </text>
+            </g>
+        );
+    }
+
+    return <Rectangle x={x} y={y} width={width} height={height} fill="#f59e0b" radius={[4, 4, 0, 0]} />;
+}
+
+function GraficoProjecao({ dados, bandeirasMensais, onToggleBandeira }: {
     dados: ProjecaoAnual['dadosGrafico'];
     bandeirasMensais: readonly NomeBandeira[];
+    onToggleBandeira: (i: number) => void;
 }) {
+    const maxVal = Math.max(...dados.map(d => d.comSolarGrid));
+    
+    // Identifica outliers (abaixo de 70% do máximo)
+    const chartDisplayData = dados.map(d => ({
+        ...d,
+        isOutlier: d.comSolarGrid < maxVal * 0.7,
+        displayValue: d.comSolarGrid,
+    }));
+
+    const normais = chartDisplayData.filter(d => !d.isOutlier);
+    const normalMin = normais.length > 0 ? Math.min(...normais.map(d => d.comSolarGrid)) : maxVal;
+    
+    const diff = maxVal - normalMin;
+    const padding = diff < 5 ? 3 : diff * 0.05;
+    
+    // Foca rigidamente nos meses normais
+    const yAxisDomain = [Math.max(0, normalMin - padding), maxVal + padding];
+
+    // Para outliers, força a barra a ser apenas um "toco" visível próximo ao eixo inferior
+    chartDisplayData.forEach(d => {
+        if (d.isOutlier) {
+            d.displayValue = Math.max(0, normalMin - padding + (padding * 0.15));
+        }
+    });
+
     return (
         <div>
             <div className="flex items-center gap-2 mb-6">
@@ -122,10 +246,12 @@ function GraficoProjecao({ dados, bandeirasMensais }: {
                 <h3 className="text-lg font-semibold text-white">Projeção Anual</h3>
             </div>
             <div className="h-[300px] sm:h-[360px] md:h-[400px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" className="focus:outline-none" style={{ outline: 'none' }}>
                     <BarChart
-                        data={dados}
+                        data={chartDisplayData}
                         margin={{ top: 8, right: 8, bottom: 16, left: 8 }}
+                        className="focus:outline-none"
+                        style={{ outline: 'none' }}
                     >
                         <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
                         <XAxis
@@ -134,7 +260,7 @@ function GraficoProjecao({ dados, bandeirasMensais }: {
                             tickLine={false}
                             axisLine={{ stroke: '#374151' }}
                             interval={0}
-                            tick={<TickComBandeira bandeirasMensais={bandeirasMensais} />}
+                            tick={<TickComBandeira bandeirasMensais={bandeirasMensais} onToggleBandeira={onToggleBandeira} />}
                             height={40}
                         />
                         <YAxis
@@ -143,9 +269,10 @@ function GraficoProjecao({ dados, bandeirasMensais }: {
                             axisLine={{ stroke: '#374151' }}
                             fontSize={12}
                             tickFormatter={formatYAxisTick}
+                            domain={yAxisDomain}
                         />
                         <Tooltip content={<TooltipMes />} cursor={{ fill: '#1f2937', opacity: 0.4 }} />
-                        <Bar dataKey="comSolarGrid" name="Com SolarGrid" fill="#f59e0b" radius={[4, 4, 0, 0]} animationDuration={600} />
+                        <Bar dataKey="displayValue" name="Com SolarGrid" shape={<CustomBarShape />} animationDuration={600} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
@@ -400,6 +527,16 @@ function App() {
     requestAnimationFrame(() => triggerPopoverRef.current?.focus());
   }, []);
 
+  const handleToggleBandeiraMes = useCallback((mesIndex: number) => {
+    const TODAS: readonly NomeBandeira[] = ['Verde', 'Amarela', 'Vermelha P1', 'Vermelha P2'];
+    setBandeirasMensais(prev => {
+      const next = [...prev];
+      const indexAtual = TODAS.indexOf(next[mesIndex]);
+      next[mesIndex] = TODAS[(indexAtual + 1) % TODAS.length];
+      return next;
+    });
+  }, []);
+
   const distribuidoras = Object.keys(distribuidorasData).sort();
 
 
@@ -449,6 +586,19 @@ function App() {
 
   return (
     <div className="min-h-screen p-4 sm:p-8 relative bg-gray-950 font-sans">
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-number-input::-webkit-inner-spin-button, 
+        .custom-number-input::-webkit-outer-spin-button { 
+          -webkit-appearance: none; 
+          margin: 0; 
+        }
+        .custom-number-input {
+          -moz-appearance: textfield;
+        }
+        .recharts-wrapper, .recharts-wrapper *, .recharts-surface, .recharts-surface * {
+          outline: none !important;
+        }
+      `}} />
       {/* Background Orbs */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute -top-24 -left-24 w-[500px] h-[500px] bg-solar-500 rounded-full mix-blend-screen filter blur-[120px] opacity-10"></div>
@@ -508,34 +658,23 @@ function App() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                    <Lightbulb className="w-4 h-4 text-solar-500" />
-                    Consumo Médio (kWh)
-                  </label>
-                  <input
-                    type="number"
-                    value={consumo}
-                    onChange={(e) => setConsumo(e.target.value)}
-                    className="block w-full bg-gray-950 border border-gray-800 text-white rounded-xl focus:ring-2 focus:ring-solar-500 focus:border-solar-500 p-3.5 shadow-inner"
-                    placeholder="Ex: 1000"
-                  />
-                </div>
+                <CustomNumberInput
+                  label="Consumo Médio (kWh)"
+                  icon={Lightbulb}
+                  value={consumo}
+                  onChange={setConsumo}
+                  placeholder="Ex: 1000"
+                  step={100}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                    <Percent className="w-4 h-4 text-solar-500" />
-                    Desconto Negociado (%)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={desconto}
-                    onChange={(e) => setDesconto(e.target.value)}
-                    className="block w-full bg-gray-950 border border-gray-800 text-white rounded-xl focus:ring-2 focus:ring-solar-500 focus:border-solar-500 p-3.5 shadow-inner"
-                    placeholder="Ex: 15"
-                  />
-                </div>
+                <CustomNumberInput
+                  label="Desconto Negociado (%)"
+                  icon={Percent}
+                  value={desconto}
+                  onChange={setDesconto}
+                  placeholder="Ex: 15"
+                  step={1}
+                />
               </div>
 
               {erro && (
@@ -687,7 +826,7 @@ function App() {
             </div>
 
             <div className="p-6 sm:p-8">
-              <GraficoProjecao dados={projecao.dadosGrafico} bandeirasMensais={bandeirasMensais} />
+              <GraficoProjecao dados={projecao.dadosGrafico} bandeirasMensais={bandeirasMensais} onToggleBandeira={handleToggleBandeiraMes} />
             </div>
 
             <RodapeProjecao
