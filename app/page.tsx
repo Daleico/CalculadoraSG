@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { distribuidorasData, BANDEIRAS_PADRAO } from '../src/core/data';
 import type { NomeBandeira } from '../src/core/data';
 import { simularComercial, calcularProjecaoAnual } from '../src/core/calculator';
@@ -197,11 +197,47 @@ function PopoverBandeiras({
     onAplicar: (meses: number[], bandeira: NomeBandeira) => void;
     onClose: () => void;
 }) {
+    const dialogRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
     }, [onClose]);
+
+    useEffect(() => {
+        dialogRef.current?.focus();
+    }, []);
+
+    useEffect(() => {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+
+        const onTabKey = (e: KeyboardEvent) => {
+            if (e.key !== 'Tab') return;
+            const focusables = dialog.querySelectorAll<HTMLElement>(
+                'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            if (focusables.length === 0) return;
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            const active = document.activeElement as HTMLElement | null;
+            if (e.shiftKey) {
+                if (active === first || !dialog.contains(active)) {
+                    e.preventDefault();
+                    last.focus();
+                }
+            } else {
+                if (active === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        };
+
+        dialog.addEventListener('keydown', onTabKey);
+        return () => dialog.removeEventListener('keydown', onTabKey);
+    }, []);
 
     const todosNomes: readonly string[] = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     const todasBandeiras: readonly NomeBandeira[] = ['Verde','Amarela','Vermelha P1','Vermelha P2'];
@@ -224,11 +260,13 @@ function PopoverBandeiras({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
             <div
+                ref={dialogRef}
+                tabIndex={-1}
                 role="dialog"
                 aria-modal="true"
                 aria-label="Personalizar bandeiras tarifárias"
                 onClick={(e) => e.stopPropagation()}
-                className="bg-gray-900 rounded-3xl shadow-2xl ring-1 ring-white/10 max-w-lg w-full p-6 sm:p-8 max-h-[90vh] overflow-y-auto"
+                className="bg-gray-900 rounded-3xl shadow-2xl ring-1 ring-white/10 max-w-lg w-full p-6 sm:p-8 max-h-[90vh] overflow-y-auto focus:outline-none"
             >
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-semibold text-white">Personalizar Bandeiras</h3>
@@ -340,6 +378,25 @@ function App() {
   const [isMenuBandeirasOpen, setIsMenuBandeirasOpen] = useState<boolean>(false);
   const [mesesSelecionados, setMesesSelecionados] = useState<number[]>([]);
   const [bandeiraSelecionadaTemp, setBandeiraSelecionadaTemp] = useState<NomeBandeira>('Verde');
+
+  const triggerPopoverRef = useRef<HTMLButtonElement>(null);
+
+  const handleClosePopover = useCallback(() => {
+    setMesesSelecionados([]);
+    setIsMenuBandeirasOpen(false);
+    requestAnimationFrame(() => triggerPopoverRef.current?.focus());
+  }, []);
+
+  const handleAplicarBandeiras = useCallback((meses: number[], bandeira: NomeBandeira) => {
+    setBandeirasMensais((prev) => {
+      const next = [...prev];
+      for (const i of meses) next[i] = bandeira;
+      return next;
+    });
+    setMesesSelecionados([]);
+    setIsMenuBandeirasOpen(false);
+    requestAnimationFrame(() => triggerPopoverRef.current?.focus());
+  }, []);
 
   const distribuidoras = Object.keys(distribuidorasData).sort();
 
@@ -616,6 +673,7 @@ function App() {
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <BotoesPromocao promocaoAtiva={promocaoAtiva} onSelect={setPromocaoAtiva} />
                 <button
+                  ref={triggerPopoverRef}
                   type="button"
                   onClick={() => setIsMenuBandeirasOpen(true)}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gray-800 text-gray-200 ring-1 ring-gray-700 hover:bg-gray-700 hover:text-white transition-all duration-200 self-start lg:self-auto"
@@ -645,19 +703,8 @@ function App() {
             bandeiraSelecionadaTemp={bandeiraSelecionadaTemp}
             onChangeMesesSelecionados={setMesesSelecionados}
             onChangeBandeiraTemp={setBandeiraSelecionadaTemp}
-            onAplicar={(meses, bandeira) => {
-              setBandeirasMensais((prev) => {
-                const next = [...prev];
-                for (const i of meses) next[i] = bandeira;
-                return next;
-              });
-              setMesesSelecionados([]);
-              setIsMenuBandeirasOpen(false);
-            }}
-            onClose={() => {
-              setMesesSelecionados([]);
-              setIsMenuBandeirasOpen(false);
-            }}
+            onAplicar={handleAplicarBandeiras}
+            onClose={handleClosePopover}
           />
         )}
 
