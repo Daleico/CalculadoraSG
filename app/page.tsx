@@ -14,6 +14,10 @@ function formatCurrency(value: number): string {
   }).format(value);
 }
 
+function formatYAxisTick(v: number): string {
+  return `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`;
+}
+
 function BarraControles({
     cenario100Verde,
     onToggleCenario,
@@ -133,7 +137,7 @@ function GraficoProjecao({ dados }: { dados: ProjecaoAnual['dadosGrafico'] }) {
                             tickLine={false}
                             axisLine={{ stroke: '#374151' }}
                             fontSize={12}
-                            tickFormatter={(v: number) => `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`}
+                            tickFormatter={formatYAxisTick}
                         />
                         <Tooltip content={<TooltipMes />} cursor={{ fill: '#1f2937', opacity: 0.4 }} />
                         <Legend wrapperStyle={{ paddingTop: 12 }} iconType="circle" />
