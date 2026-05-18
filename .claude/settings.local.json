@@ -28,7 +28,8 @@
       "Bash(echo \"lint: $?\")",
       "Bash(echo \"build exit: $?\")",
       "Skill(using-superpowers)",
-      "PowerShell(npx --no-install tsc --noEmit -p . 2>&1 | Select-Object -First 30)"
+      "PowerShell(npx --no-install tsc --noEmit -p . 2>&1 | Select-Object -First 30)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
