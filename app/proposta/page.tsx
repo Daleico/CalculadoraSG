@@ -5,10 +5,20 @@
 import { Suspense, useState, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { Montserrat } from 'next/font/google';
 import { distribuidorasData, BANDEIRAS_PADRAO } from '../../src/core/data';
 import { simularComercial, calcularProjecaoAnual } from '../../src/core/calculator';
 import type { PromocaoComercial } from '../../src/core/types';
 import './proposta.css';
+
+// Montserrat auto-hospedada (mesmo domínio) — necessário para o html2canvas
+// medir os glifos com as métricas corretas no card exportado.
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
 
 // ---------- helpers (portados do gerador HTML) ----------
 function parseMoney(v: string): number {
@@ -164,14 +174,27 @@ function GeradorPropostaInner() {
 
   // --- exportação (html2canvas) ---
   const buildCanvas = useCallback(async () => {
-    if (document.fonts && document.fonts.ready) {
-      try { await document.fonts.ready; } catch { /* ignore */ }
+    // Garante que a Montserrat (todos os pesos usados no card) esteja carregada
+    // antes da captura — evita que o html2canvas use uma fonte fallback mais alta.
+    if (document.fonts && cardRef.current) {
+      const fam = getComputedStyle(cardRef.current).fontFamily;
+      const pesos = ['300', '400', '500', '600', '700', '800'];
+      try {
+        await Promise.all(pesos.map((w) => document.fonts.load(`${w} 64px ${fam}`)));
+        await document.fonts.ready;
+      } catch { /* ignore */ }
     }
     const html2canvas = (await import('html2canvas')).default;
     const wrap = wrapRef.current!;
     const card = cardRef.current!;
     const prev = wrap.style.transform;
     wrap.style.transform = 'none';
+    // O html2canvas mede a altura do número grande (Montserrat, line-height < 1)
+    // menor do que os glifos ocupam, fazendo a nota subir por cima do número.
+    // Compensamos o espaçamento APENAS durante a captura (o preview ao vivo fica intacto).
+    const note = card.querySelector<HTMLElement>('.hero .note');
+    const prevNoteMargin = note?.style.marginTop ?? '';
+    if (note) note.style.marginTop = '64px';
     try {
       return await html2canvas(card, {
         scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false,
@@ -179,6 +202,7 @@ function GeradorPropostaInner() {
       });
     } finally {
       wrap.style.transform = prev;
+      if (note) note.style.marginTop = prevNoteMargin;
     }
   }, []);
 
@@ -239,14 +263,7 @@ function GeradorPropostaInner() {
   const consumoNum = Number(consumo);
 
   return (
-    <div className="sg-proposta">
-      {/* Montserrat em pesos estáticos — necessária para o card exportado bater com o layout */}
-      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-      <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet"
-      />
-
+    <div className={`sg-proposta ${montserrat.variable}`}>
       <div className="app">
 
         {/* TOPBAR */}
