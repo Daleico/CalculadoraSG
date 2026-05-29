@@ -1,0 +1,162 @@
+/* Gerador de Proposta — estilos portados do HTML original, escopados em .sg-proposta */
+
+.sg-proposta {
+  --aurora: #EC6726;
+  --vega: #F33C13;
+  --eclipse: #000000;
+  --orion: #151B21;
+  --nebulosa: #CBD6D7;
+  --sirius: #F3F3F3;
+  --branco: #FFFFFF;
+  --ink: #000000;
+  --gray65: #7C7C7B;
+  --gray45: #A8A8A7;
+
+  font-family: 'Montserrat', sans-serif;
+  background: var(--sirius);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  padding: 28px;
+}
+.sg-proposta * { box-sizing: border-box; margin: 0; padding: 0; }
+
+.sg-proposta .app {
+  max-width: 1320px; margin: 0 auto; display: grid;
+  grid-template-columns: minmax(360px, 1fr) auto; gap: 36px; align-items: start;
+}
+@media (max-width: 980px) { .sg-proposta .app { grid-template-columns: 1fr; } }
+
+.sg-proposta .topbar {
+  grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px; margin-bottom: 4px;
+}
+.sg-proposta .topbar .brand { display: flex; align-items: center; gap: 14px; }
+.sg-proposta .topbar .brand img { height: 34px; }
+.sg-proposta .topbar .brand .pipe { width: 1px; height: 26px; background: var(--nebulosa); }
+.sg-proposta .topbar .brand h1 { font-size: 15px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--orion); }
+.sg-proposta .topbar .hint { font-size: 12.5px; color: var(--gray65); max-width: 420px; line-height: 1.5; }
+
+.sg-proposta .back {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600;
+  color: var(--gray65); text-decoration: none; transition: .15s;
+}
+.sg-proposta .back:hover { color: var(--aurora); }
+
+.sg-proposta .panel { background: var(--branco); border: 1px solid var(--nebulosa); border-radius: 18px; padding: 26px 26px 22px; }
+.sg-proposta .panel h2 { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--aurora); margin-bottom: 18px; }
+.sg-proposta .panel .h2row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.sg-proposta .panel .h2row h2 { margin-bottom: 0; }
+
+.sg-proposta .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+.sg-proposta .field { display: flex; flex-direction: column; gap: 6px; }
+.sg-proposta .field.full { grid-column: 1 / -1; }
+.sg-proposta .field label { font-size: 12px; font-weight: 600; color: var(--orion); letter-spacing: .01em; }
+.sg-proposta .field .sub { font-size: 10.5px; color: var(--gray65); font-weight: 500; }
+.sg-proposta .field input[type=text],
+.sg-proposta .field input[type=date],
+.sg-proposta .field select {
+  font-family: inherit; font-size: 14px; font-weight: 500; color: var(--ink);
+  background: var(--sirius); border: 1.5px solid transparent; border-radius: 10px;
+  padding: 11px 12px; outline: none; transition: .15s; width: 100%;
+}
+.sg-proposta .field input:focus, .sg-proposta .field select:focus { border-color: var(--aurora); background: var(--branco); }
+.sg-proposta .field input:disabled, .sg-proposta .field select:disabled { color: var(--gray45); cursor: not-allowed; }
+.sg-proposta .field .moneywrap { position: relative; }
+.sg-proposta .field .moneywrap span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; color: var(--gray65); pointer-events: none; }
+.sg-proposta .field .moneywrap input { padding-left: 38px; }
+
+/* bloco de economia calculada (modo básico) */
+.sg-proposta .calcbox { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: var(--sirius); border-radius: 12px; padding: 14px; }
+@media (max-width: 560px) { .sg-proposta .calcbox { grid-template-columns: 1fr; } }
+.sg-proposta .calcbox .ci .k { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--gray65); }
+.sg-proposta .calcbox .ci .v { font-size: 18px; font-weight: 700; color: var(--orion); margin-top: 4px; }
+.sg-proposta .calcbox .ci .v.hi { color: var(--aurora); }
+
+.sg-proposta .switchrow { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 12px; background: var(--sirius); grid-column: 1 / -1; }
+.sg-proposta .switchrow .txt { flex: 1; }
+.sg-proposta .switchrow .txt b { font-size: 12.5px; font-weight: 600; color: var(--orion); display: block; }
+.sg-proposta .switchrow .txt small { font-size: 11px; color: var(--gray65); }
+.sg-proposta .switch { position: relative; width: 46px; height: 26px; flex: 0 0 auto; cursor: pointer; }
+.sg-proposta .switch input { opacity: 0; width: 0; height: 0; }
+.sg-proposta .slider { position: absolute; inset: 0; background: var(--nebulosa); border-radius: 30px; transition: .2s; }
+.sg-proposta .slider:before { content: ""; position: absolute; height: 20px; width: 20px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+.sg-proposta .switch input:checked + .slider { background: var(--aurora); }
+.sg-proposta .switch input:checked + .slider:before { transform: translateX(20px); }
+
+.sg-proposta .errbox { grid-column: 1 / -1; font-size: 12px; font-weight: 600; color: var(--vega); background: #fdecec; border-radius: 10px; padding: 10px 12px; }
+
+.sg-proposta .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; align-items: center; }
+.sg-proposta .btn { font-family: inherit; font-size: 13.5px; font-weight: 600; border: none; border-radius: 11px; padding: 13px 20px; cursor: pointer; transition: .15s; display: inline-flex; align-items: center; gap: 8px; }
+.sg-proposta .btn.primary { background: var(--aurora); color: #fff; }
+.sg-proposta .btn.primary:hover { background: var(--vega); }
+.sg-proposta .btn.ghost { background: var(--orion); color: #fff; }
+.sg-proposta .btn.ghost:hover { background: #000; }
+.sg-proposta .btn.text { background: none; color: var(--gray65); padding: 13px 8px; }
+.sg-proposta .btn.text:hover { color: var(--vega); }
+.sg-proposta .btn:disabled { opacity: .5; cursor: not-allowed; }
+.sg-proposta .toast { font-size: 12.5px; font-weight: 600; color: #1a7a3c; opacity: 0; transition: .2s; }
+.sg-proposta .toast.err { color: var(--vega); }
+.sg-proposta .toast.show { opacity: 1; }
+
+.sg-proposta .previewcol { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.sg-proposta .frame { width: 486px; height: 648px; overflow: hidden; border-radius: 20px; box-shadow: 0 18px 50px rgba(0, 0, 0, .16); background: #fff; }
+@media (max-width: 980px) { .sg-proposta .frame { width: 360px; height: 480px; } }
+.sg-proposta #cardWrap { transform: scale(.45); transform-origin: top left; }
+@media (max-width: 980px) { .sg-proposta #cardWrap { transform: scale(.3333); } }
+.sg-proposta .previewcol .cap { font-size: 11.5px; color: var(--gray65); text-align: center; }
+
+/* ===== CARD 3:4 (1080 x 1440) ===== */
+.sg-proposta #card { width: 1080px; height: 1440px; background: var(--branco); position: relative; overflow: hidden; font-family: 'Montserrat', sans-serif; color: var(--ink); }
+.sg-proposta #card .deco-top { position: absolute; top: -280px; right: -260px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle at center, rgba(236, 103, 38, .10), rgba(236, 103, 38, 0) 70%); }
+.sg-proposta #card .deco-bot { position: absolute; bottom: -300px; left: -220px; width: 560px; height: 560px; border-radius: 50%; background: radial-gradient(circle at center, rgba(203, 214, 215, .45), rgba(203, 214, 215, 0) 72%); }
+.sg-proposta #card .inner { position: relative; padding: 72px; height: 100%; display: flex; flex-direction: column; }
+
+.sg-proposta #card .c-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 34px; }
+.sg-proposta #card .c-head img { height: 60px; }
+.sg-proposta #card .c-tag { font-size: 18px; font-weight: 700; letter-spacing: .14em; color: var(--aurora); text-transform: uppercase; text-align: right; line-height: 1.3; }
+
+.sg-proposta #card .c-hi { font-size: 44px; font-weight: 700; color: var(--orion); margin-bottom: 6px; }
+.sg-proposta #card .c-sub { font-size: 23px; font-weight: 500; color: var(--gray65); margin-bottom: 28px; line-height: 1.4; }
+
+/* herói = ECONOMIA ANUAL */
+.sg-proposta #card .hero { background: var(--orion); border-radius: 30px; padding: 46px 56px; margin-bottom: 24px; position: relative; overflow: hidden; }
+.sg-proposta #card .hero .glow { position: absolute; top: -130px; right: -130px; width: 380px; height: 380px; border-radius: 50%; background: radial-gradient(circle at center, rgba(236, 103, 38, .32), rgba(236, 103, 38, 0) 70%); }
+.sg-proposta #card .hero .lbl { font-size: 22px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--aurora); margin-bottom: 8px; position: relative; }
+.sg-proposta #card .hero .big { font-size: 112px; font-weight: 800; line-height: 1.08; color: #fff; position: relative; letter-spacing: -.02em; }
+.sg-proposta #card .hero .big .u { font-size: 50px; font-weight: 700; color: var(--nebulosa); }
+.sg-proposta #card .hero .note { font-size: 23px; font-weight: 500; color: var(--nebulosa); margin-top: 12px; position: relative; }
+
+/* economia mensal = secundário */
+.sg-proposta #card .month { display: flex; align-items: center; justify-content: space-between; background: var(--sirius); border-radius: 24px; padding: 30px 40px; margin-bottom: 26px; }
+.sg-proposta #card .month .ml { padding-right: 24px; }
+.sg-proposta #card .month .ml .k { font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--orion); }
+.sg-proposta #card .month .ml .s { font-size: 21px; font-weight: 500; color: var(--gray65); margin-top: 6px; line-height: 1.3; max-width: 480px; }
+.sg-proposta #card .month .mv { font-size: 66px; font-weight: 800; color: var(--aurora); letter-spacing: -.01em; white-space: nowrap; line-height: 1; }
+.sg-proposta #card .month .mv .u { font-size: 34px; font-weight: 700; }
+
+/* selos de benefício */
+.sg-proposta #card .badges { display: flex; flex-wrap: wrap; margin-bottom: 30px; }
+.sg-proposta #card .badge { font-size: 21px; font-weight: 600; color: var(--orion); background: var(--branco); border: 2px solid var(--nebulosa); border-radius: 40px; padding: 12px 24px; margin: 0 12px 12px 0; display: flex; align-items: center; }
+.sg-proposta #card .badge .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--aurora); margin-right: 11px; }
+.sg-proposta #card .badge.hot { background: var(--aurora); border-color: var(--aurora); color: #fff; }
+.sg-proposta #card .badge.hot .dot { background: #fff; }
+
+.sg-proposta #card .details { flex: 1 1 auto; display: flex; flex-wrap: wrap; align-content: center; justify-content: space-between; }
+.sg-proposta #card .det { width: calc(50% - 9px); background: var(--sirius); border-radius: 18px; padding: 26px 28px; margin-bottom: 18px; }
+.sg-proposta #card .det.hot { background: var(--eclipse); }
+.sg-proposta #card .det .dk { font-size: 18px; font-weight: 600; color: var(--gray65); text-transform: uppercase; letter-spacing: .04em; }
+.sg-proposta #card .det.hot .dk { color: var(--nebulosa); }
+.sg-proposta #card .det .dv { font-size: 34px; font-weight: 700; color: var(--orion); margin-top: 8px; }
+.sg-proposta #card .det.hot .dv { color: var(--aurora); font-size: 42px; }
+
+.sg-proposta #card .strip { background: var(--aurora); border-radius: 22px; padding: 28px 40px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; }
+.sg-proposta #card .strip .st { font-size: 28px; font-weight: 700; letter-spacing: .05em; color: #fff; text-transform: uppercase; line-height: 1.28; }
+.sg-proposta #card .strip img { height: 38px; }
+
+.sg-proposta #card .c-foot { display: flex; align-items: flex-end; justify-content: space-between; }
+.sg-proposta #card .c-foot .who { font-size: 23px; font-weight: 600; color: var(--orion); }
+.sg-proposta #card .c-foot .who span { color: var(--aurora); }
+.sg-proposta #card .c-foot .val { text-align: right; font-size: 20px; font-weight: 600; color: var(--gray65); }
+.sg-proposta #card .c-foot .val em { font-style: normal; color: var(--aurora); }
+.sg-proposta #card .c-foot .val small { display: block; font-size: 16px; font-weight: 500; color: var(--gray45); margin-top: 4px; }

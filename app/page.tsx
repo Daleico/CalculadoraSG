@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import { distribuidorasData, BANDEIRAS_PADRAO } from '../src/core/data';
 import type { NomeBandeira } from '../src/core/data';
 import { simularComercial, calcularProjecaoAnual } from '../src/core/calculator';
 import type { SimulacaoComercial, PromocaoComercial, ProjecaoAnual } from '../src/core/types';
-import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator, BarChart3, Pencil, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { Zap, Percent, AlertCircle, Building2, TrendingDown, Lightbulb, Calculator, BarChart3, Pencil, X, ChevronUp, ChevronDown, FileText, ArrowRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 function formatCurrency(value: number): string {
@@ -871,6 +872,16 @@ function App() {
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2">Simulador SolarGrid</h1>
           <p className="text-gray-400 max-w-xl mx-auto">Calcule instantaneamente sua economia mensal livre de bandeiras tarifárias.</p>
+          <div className="mt-5 flex justify-center">
+            <Link
+              href={`/proposta?distribuidora=${encodeURIComponent(distribuidora)}&consumo=${encodeURIComponent(String(consumo))}&desconto=${encodeURIComponent(String(desconto))}`}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-solar-500 text-gray-950 ring-2 ring-solar-400 shadow-lg shadow-solar-500/20 hover:bg-solar-400 transition-all duration-200"
+            >
+              <FileText className="w-4 h-4" />
+              Gerador de Proposta
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
