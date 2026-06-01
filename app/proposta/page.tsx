@@ -137,7 +137,6 @@ function GeradorPropostaInner() {
   // valores que vão para o card: manual (avançado) ou calculado
   const anoFinal = avancado ? parseMoney(manualAno) : calc.ano;
   const mesFinal = avancado ? parseMoney(manualMes) : calc.mes;
-  const priFinal = avancado ? parseMoney(manualPri) : calc.pri;
 
   const handleToggleAvancado = (on: boolean) => {
     if (on) {
@@ -162,25 +161,24 @@ function GeradorPropostaInner() {
   const badges = useMemo(() => {
     const out: Array<{ t: string; hot?: boolean }> = [];
     if (blindagem) out.push({ t: 'Blindagem de bandeira tarifária' });
+    // Desconto inicial (1ª fatura) ao lado da blindagem — só quando aplicado.
+    // O % recorrente da tarifa líquida já aparece na caixa de detalhes (15%).
     if (benef !== 'nenhum') {
-      let t: string;
-      if (!isNaN(priFinal)) t = `R$ ${fmtBRL(priFinal)} de economia no 1º mês`;
-      else t = benef === '50' ? '50% OFF na 1ª fatura' : '1ª fatura grátis';
-      out.push({ t, hot: true });
+      const pct = benef === '50' ? 50 : 100;
+      out.push({ t: `${pct}% de desconto no 1º mês`, hot: true });
     }
     out.push({ t: 'Sem obras · Sem investimento' });
     return out;
-  }, [blindagem, benef, priFinal]);
+  }, [blindagem, benef]);
 
   // --- exportação (html2canvas) ---
   const buildCanvas = useCallback(async () => {
-    // Garante que a Montserrat (todos os pesos usados no card) esteja carregada
-    // antes da captura — evita que o html2canvas use uma fonte fallback mais alta.
+    const pesos = ['300', '400', '500', '600', '700', '800'];
+    // Pré-carrega a Montserrat no documento principal (cobre o preview).
     if (document.fonts && cardRef.current) {
       const fam = getComputedStyle(cardRef.current).fontFamily;
-      const pesos = ['300', '400', '500', '600', '700', '800'];
       try {
-        await Promise.all(pesos.map((w) => document.fonts.load(`${w} 64px ${fam}`)));
+        await Promise.all(pesos.map((w) => document.fonts.load(`${w} 112px ${fam}`)));
         await document.fonts.ready;
       } catch { /* ignore */ }
     }
@@ -189,12 +187,17 @@ function GeradorPropostaInner() {
     const card = cardRef.current!;
     const prev = wrap.style.transform;
     wrap.style.transform = 'none';
-    // O html2canvas mede a altura do número grande (Montserrat, line-height < 1)
-    // menor do que os glifos ocupam, fazendo a nota subir por cima do número.
-    // Compensamos o espaçamento APENAS durante a captura (o preview ao vivo fica intacto).
+    // No ambiente Next (next/font + reset global do Tailwind) o html2canvas
+    // posiciona o número herói mais baixo do que o browser, fazendo a nota
+    // "estimativa..." subir por cima do valor — só no PNG. (O HTML original
+    // exporta limpo no mesmo html2canvas, e o preview ao vivo também renderiza
+    // certo, por isso compensamos APENAS durante a captura.) Empurramos a nota
     const note = card.querySelector<HTMLElement>('.hero .note');
     const prevNoteMargin = note?.style.marginTop ?? '';
-    if (note) note.style.marginTop = '64px';
+    if (note) note.style.marginTop = '44px';
+    const dots = Array.from(card.querySelectorAll<HTMLElement>('.badge .dot'));
+    const prevDots = dots.map((d) => ({ position: d.style.position, top: d.style.top }));
+    dots.forEach((d) => { d.style.position = 'relative'; d.style.top = '9px'; });
     try {
       return await html2canvas(card, {
         scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false,
@@ -203,6 +206,7 @@ function GeradorPropostaInner() {
     } finally {
       wrap.style.transform = prev;
       if (note) note.style.marginTop = prevNoteMargin;
+      dots.forEach((d, i) => { d.style.position = prevDots[i].position; d.style.top = prevDots[i].top; });
     }
   }, []);
 
@@ -437,7 +441,7 @@ function GeradorPropostaInner() {
 
                   <div className="badges">
                     {badges.map((b, i) => (
-                      <div key={i} className={`badge${b.hot ? ' hot' : ''}`}><span className="dot" />{b.t}</div>
+                       <div key={i} className={`badge${b.hot ? ' hot' : ''}`}><span className="dot" /><span>{b.t}</span></div>
                     ))}
                   </div>
 
