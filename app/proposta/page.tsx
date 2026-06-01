@@ -41,11 +41,12 @@ function BigBRL({ n }: { n: number }) {
   return <>R$ {i.toLocaleString('pt-BR')}<span className="u">,{c}</span></>;
 }
 
-type Benef = 'nenhum' | '50' | 'gratis';
+type Benef = 'nenhum' | '50' | 'gratis' | 'gratis2';
 
 function benefToPromo(b: Benef): PromocaoComercial {
   if (b === '50') return '50_OFF';
   if (b === 'gratis') return '1_GRATIS';
+  if (b === 'gratis2') return '2_GRATIS';
   return 'NENHUMA';
 }
 
@@ -164,8 +165,12 @@ function GeradorPropostaInner() {
     // Desconto inicial (1ª fatura) ao lado da blindagem — só quando aplicado.
     // O % recorrente da tarifa líquida já aparece na caixa de detalhes (15%).
     if (benef !== 'nenhum') {
-      const pct = benef === '50' ? 50 : 100;
-      out.push({ t: `${pct}% de desconto no 1º mês`, hot: true });
+      if (benef === 'gratis2') {
+        out.push({ t: '100% de desconto no 1º e 2º mês', hot: true });
+      } else {
+        const pct = benef === '50' ? 50 : 100;
+        out.push({ t: `${pct}% de desconto no 1º mês`, hot: true });
+      }
     }
     out.push({ t: 'Sem obras · Sem investimento' });
     return out;
@@ -318,11 +323,12 @@ function GeradorPropostaInner() {
             </div>
 
             <div className="field full">
-              <label>Benefício comercial <span className="sub">(vira selo de &quot;economia no 1º mês&quot;)</span></label>
+              <label>Benefício comercial <span className="sub">(vira selo de &quot;desconto inicial&quot;)</span></label>
               <select value={benef} onChange={(e) => setBenef(e.target.value as Benef)}>
                 <option value="nenhum">Nenhum</option>
                 <option value="50">50% na primeira fatura</option>
                 <option value="gratis">Primeira fatura grátis</option>
+                <option value="gratis2">Primeira e segunda fatura grátis</option>
               </select>
             </div>
 
