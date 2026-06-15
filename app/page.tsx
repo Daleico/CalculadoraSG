@@ -958,29 +958,35 @@ function App() {
               <div className="space-y-8 animate-fade-up">
 
                 {/* Destaques (Bandeira Verde) */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-gray-900 rounded-2xl p-6 ring-1 ring-white/5 shadow-lg">
-                    <p className="text-sm font-medium text-gray-400 mb-1">Fatura Atual</p>
-                    <p className="text-3xl font-bold text-gray-200">{formatCurrency(resultado.faturaAtualBase)}</p>
-                    <p className="text-xs text-gray-500 mt-2">Bandeira Verde (Sem acréscimos)</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+                  <div className="bg-gray-900 rounded-2xl p-4 xl:p-5 ring-1 ring-white/5 shadow-lg flex flex-col min-w-0">
+                    <p className="text-xs xl:text-sm font-medium text-gray-400 mb-1 truncate">Fatura Atual</p>
+                    <p className="text-xl lg:text-lg xl:text-2xl font-bold text-gray-200 mt-1 whitespace-nowrap tracking-tight">{formatCurrency(resultado.faturaAtualBase)}</p>
+                    <p className="text-[10px] xl:text-xs text-gray-500 mt-auto pt-2 leading-tight">Bandeira Verde (com iluminação pública)</p>
                   </div>
 
-                  <div className="bg-gradient-to-br from-solar-600/20 to-gray-900 rounded-2xl p-6 ring-1 ring-solar-500/30 shadow-lg relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-10">
-                      <Zap className="w-16 h-16 text-solar-500" />
+                  <div className="bg-gradient-to-br from-solar-600/20 to-gray-900 rounded-2xl p-4 xl:p-5 ring-1 ring-solar-500/30 shadow-lg relative overflow-hidden flex flex-col min-w-0">
+                    <div className="absolute top-0 right-0 p-3 xl:p-4 opacity-10">
+                      <Zap className="w-12 h-12 xl:w-14 xl:h-14 text-solar-500" />
                     </div>
-                    <p className="text-sm font-medium text-solar-400 mb-1">Nova Fatura SolarGrid</p>
-                    <p className="text-3xl font-bold text-white relative z-10">{formatCurrency(resultado.faturaSGBase)}</p>
-                    <p className="text-xs text-gray-400 mt-2 relative z-10">Blindada contra bandeiras</p>
+                    <p className="text-xs xl:text-sm font-medium text-solar-400 mb-1 pr-6 truncate leading-tight">Nova Despesa</p>
+                    <p className="text-xl lg:text-lg xl:text-2xl font-bold text-white relative z-10 mt-1 whitespace-nowrap tracking-tight">{formatCurrency(resultado.faturaSGBase)}</p>
+                    <p className="text-[10px] xl:text-xs text-gray-400 mt-auto pt-2 relative z-10 leading-tight">Total (SolarGrid + concessionária)</p>
                   </div>
 
-                  <div className="bg-emerald-950/30 rounded-2xl p-6 ring-1 ring-emerald-500/30 shadow-lg relative overflow-hidden">
+                  <div className="bg-gray-900 rounded-2xl p-4 xl:p-5 ring-1 ring-solar-500/20 shadow-lg flex flex-col min-w-0">
+                    <p className="text-xs xl:text-sm font-medium text-solar-400 mb-1 truncate">Fatura SG</p>
+                    <p className="text-xl lg:text-lg xl:text-2xl font-bold text-gray-200 mt-1 whitespace-nowrap tracking-tight">{formatCurrency(resultado.detalhesFatura.faturaSG)}</p>
+                    <p className="text-[10px] xl:text-xs text-gray-500 mt-auto pt-2 leading-tight">Referente à energia injetada</p>
+                  </div>
+
+                  <div className="bg-emerald-950/30 rounded-2xl p-4 xl:p-5 ring-1 ring-emerald-500/30 shadow-lg relative overflow-hidden flex flex-col min-w-0">
                     <div className="absolute -bottom-2 -right-2 p-2 opacity-10">
-                      <TrendingDown className="w-20 h-20 text-emerald-500" />
+                      <TrendingDown className="w-16 h-16 xl:w-20 xl:h-20 text-emerald-500" />
                     </div>
-                    <p className="text-sm font-medium text-emerald-500 mb-1">Economia Mensal</p>
-                    <p className="text-3xl font-bold text-emerald-400 relative z-10">{formatCurrency(resultado.economiaBase)}</p>
-                    <p className="text-xs text-emerald-600/70 mt-2 relative z-10">Dinheiro de volta no bolso</p>
+                    <p className="text-xs xl:text-sm font-medium text-emerald-500 mb-1 truncate">Economia Mensal</p>
+                    <p className="text-xl lg:text-lg xl:text-2xl font-bold text-emerald-400 relative z-10 mt-1 whitespace-nowrap tracking-tight">{formatCurrency(resultado.economiaBase)}</p>
+                    <p className="text-[10px] xl:text-xs text-emerald-600/70 mt-auto pt-2 relative z-10 leading-tight">Dinheiro de volta no bolso</p>
                   </div>
                 </div>
 
@@ -1010,6 +1016,10 @@ function App() {
                     <div className="flex justify-between items-center py-2 border-b border-gray-800">
                       <span className="text-gray-400 text-sm">Impostos Não Isentos (ICMS + PIS)</span>
                       <span className="text-gray-300 font-medium">{formatCurrency(resultado.detalhesFatura.impostosConcessionaria)}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-800">
+                      <span className="text-gray-400 text-sm">Iluminação Pública (CIP/COSIP)</span>
+                      <span className="text-gray-300 font-medium">{formatCurrency(resultado.detalhesFatura.iluminacaoPublica)}</span>
                     </div>
                     <div className="flex justify-between items-center pt-2">
                       <span className="text-gray-200 font-semibold">Total a Pagar (Novo Valor)</span>
@@ -1097,7 +1107,7 @@ function App() {
               </div>
             </div>
 
-            <div className="p-4 lg:p-6">
+            <div className="p-4 lg:p-6 w-full min-w-0 overflow-hidden">
               <GraficoProjecao
                 dados={projecao.dadosGrafico}
                 bandeirasMensais={bandeirasMensais}

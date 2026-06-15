@@ -60,8 +60,12 @@ export function simularComercial(nomeDistribuidora: string, descontoPercentual: 
     const dados = distribuidorasData[nomeNorm];
     const { icmsNI, pisNI } = resultadoTarifa.detalhes;
 
-    const faturaAtualBase = (dados.TotalC / 1000) * consumoKwh;
-    
+    // Iluminação Pública (CIP/COSIP): alíquota R$/kWh aplicada sobre o consumo total,
+    // idêntica na fatura atual e na fatura com GD (não altera a economia, apenas o valor pago).
+    const iluminacaoPublica = dados.cipPorKwh * consumoKwh;
+
+    const faturaAtualBase = (dados.TotalC / 1000) * consumoKwh + iluminacaoPublica;
+
     // Novo cálculo rigoroso da Fatura SG respeitando o custo mínimo
     const energiaInjetada = consumoKwh - consumoMinimo;
     // Fórmulas exatas de "Arredondamento Tardio" exigidas para bater a Fatura e os Impostos
@@ -69,8 +73,8 @@ export function simularComercial(nomeDistribuidora: string, descontoPercentual: 
     const impostosConcessionaria = ((icmsNI + pisNI) / 1000) * energiaInjetada;
     const custoMinimoConcessionaria = (consumoMinimo / 1000) * dados.TotalC;
 
-    const faturaSGBase = Math.round((faturaSG + impostosConcessionaria + custoMinimoConcessionaria) * 100) / 100;
-    
+    const faturaSGBase = Math.round((faturaSG + impostosConcessionaria + custoMinimoConcessionaria + iluminacaoPublica) * 100) / 100;
+
     const economiaBase = faturaAtualBase - faturaSGBase;
 
     const cenarios = Object.entries(bandeirasTarifarias).map(([nomeBandeira, valorBandeira]) => {
@@ -104,7 +108,8 @@ export function simularComercial(nomeDistribuidora: string, descontoPercentual: 
             energiaInjetada,
             faturaSG,
             custoMinimoConcessionaria,
-            impostosConcessionaria
+            impostosConcessionaria,
+            iluminacaoPublica
         },
         cenarios
     };

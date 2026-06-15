@@ -6,6 +6,7 @@ export interface DistribuidoraValores {
     ICMSTUSD: number;
     regraIcmsNI: "ISENTO" | "TUSD" | "CHEIO";
     regraPisCofinsNI: "ISENTO" | "CHEIO";
+    cipPorKwh: number;
 }
 
 export interface ResultadoCalculoSG {
@@ -38,6 +39,7 @@ export interface SimulacaoComercial {
         faturaSG: number;
         custoMinimoConcessionaria: number;
         impostosConcessionaria: number;
+        iluminacaoPublica: number;
     };
     cenarios: SimulacaoBandeira[];
 }
