@@ -1,18 +1,19 @@
 import type { DistribuidoraValores } from './types';
 
 export const distribuidorasData: Record<string, DistribuidoraValores> = {
-    "RGE":          { TotalC: 1044.67, TotalS: 822.20, PIS: 43.27, ICMSTE: 66.35, ICMSTUSD: 112.84, regraIcmsNI: "CHEIO",  regraPisCofinsNI: "CHEIO", cipPorKwh: 0.07 },
-    "EDP SP":       { TotalC: 1012.01, TotalS: 786.70, PIS: 41.41, ICMSTE: 77.15, ICMSTUSD: 106.75, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.08 },
-    "ELEKTRO":      { TotalC: 1024.04, TotalS: 796.05, PIS: 41.90, ICMSTE: 74.38, ICMSTUSD: 111.71, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.07 },
-    "COELBA":       { TotalC: 1112.32, TotalS: 837.72, PIS: 44.09, ICMSTE: 76.29, ICMSTUSD: 154.23, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.08 },
-    "LIGHT":        { TotalC: 1131.63, TotalS: 823.56, PIS: 55.37, ICMSTE: 95.20, ICMSTUSD: 157.50, regraIcmsNI: "TUSD",   regraPisCofinsNI: "ISENTO", cipPorKwh: 0.12 },
-    "CEMIG":        { TotalC: 1129.26, TotalS: 858.58, PIS: 64.62, ICMSTE: 76.15, ICMSTUSD: 129.91, regraIcmsNI: "ISENTO", regraPisCofinsNI: "CHEIO", cipPorKwh: 0.06 },
-    "EQUATORIAL GO":{ TotalC: 1153.55, TotalS: 891.81, PIS: 51.90, ICMSTE: 76.27, ICMSTUSD: 133.57, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.09 },
-    "EMR":          { TotalC: 1051.04, TotalS: 817.04, PIS: 43.00, ICMSTE: 82.91, ICMSTUSD: 108.08, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.07 },
-    "ESS":          { TotalC: 959.34,  TotalS: 745.76, PIS: 39.25, ICMSTE: 75.29, ICMSTUSD: 99.04,  regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.07 },
-    "ENEL RJ":      { TotalC: 1190.42, TotalS: 925.39, PIS: 48.70, ICMSTE: 68.59, ICMSTUSD: 147.74, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.09 },
-    "CPFL PAULISTA":{ TotalC: 878.55,  TotalS: 675.53, PIS: 43.04, ICMSTE: 68.05, ICMSTUSD: 91.92,  regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.07 },
-    "EQUATORIAL PI":{ TotalC: 1297.63, TotalS: 946.69, PIS: 55.10, ICMSTE: 93.58, ICMSTUSD: 202.26, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.10 },
+    "RGE":          { TotalC: 1042.74, TotalS: 822.20, PIS: 43.27, ICMSTE: 65.64, ICMSTUSD: 111.63, regraIcmsNI: "CHEIO",  regraPisCofinsNI: "CHEIO", cipPorKwh: 0.07 },
+    "EDP SP":       { TotalC: 1009.88, TotalS: 786.70, PIS: 41.41, ICMSTE: 76.26, ICMSTUSD: 105.52, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.08 },
+    "ELEKTRO":      { TotalC: 1021.89, TotalS: 796.05, PIS: 41.90, ICMSTE: 73.53, ICMSTUSD: 110.41, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.07 },
+    "COELBA":       { TotalC: 1162.17, TotalS: 877.73, PIS: 46.20, ICMSTE: 69.93, ICMSTUSD: 168.31, regraIcmsNI: "CHEIO",  regraPisCofinsNI: "CHEIO", cipPorKwh: 0.08 },
+    "LIGHT":        { TotalC: 1219.61, TotalS: 880.56, PIS: 46.35, ICMSTE: 100.39, ICMSTUSD: 192.32, regraIcmsNI: "TUSD",  regraPisCofinsNI: "ISENTO", cipPorKwh: 0.12 },
+    "CEMIG":        { TotalC: 1159.55, TotalS: 903.29, PIS: 47.54, ICMSTE: 71.68, ICMSTUSD: 137.04, regraIcmsNI: "ISENTO", regraPisCofinsNI: "CHEIO", cipPorKwh: 0.06 },
+    "EQUATORIAL GO":{ TotalC: 1158.95, TotalS: 891.81, PIS: 46.94, ICMSTE: 80.03, ICMSTUSD: 140.17, regraIcmsNI: "CHEIO",  regraPisCofinsNI: "CHEIO", cipPorKwh: 0.09 },
+    "EMR":          { TotalC: 1048.83, TotalS: 817.04, PIS: 43.00, ICMSTE: 81.96, ICMSTUSD: 106.83, regraIcmsNI: "ISENTO", regraPisCofinsNI: "CHEIO", cipPorKwh: 0.07 },
+    "ESS":          { TotalC: 957.33,  TotalS: 745.76, PIS: 39.25, ICMSTE: 74.42, ICMSTUSD: 97.90,  regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.07 },
+    "ENEL RJ":      { TotalC: 1469.67, TotalS: 1061.10, PIS: 55.85, ICMSTE: 109.49, ICMSTUSD: 243.23, regraIcmsNI: "TUSD",  regraPisCofinsNI: "CHEIO", cipPorKwh: 0.09 },
+    "CPFL PAULISTA":{ TotalC: 949.23,  TotalS: 739.45, PIS: 38.92, ICMSTE: 67.06, ICMSTUSD: 103.81, regraIcmsNI: "TUSD",   regraPisCofinsNI: "CHEIO", cipPorKwh: 0.07 },
+    "EQUATORIAL PI":{ TotalC: 1365.09, TotalS: 946.69, PIS: 49.83, ICMSTE: 116.59, ICMSTUSD: 251.98, regraIcmsNI: "CHEIO",  regraPisCofinsNI: "CHEIO", cipPorKwh: 0.10 },
+    "CEEE":         { TotalC: 1042.49, TotalS: 822.00, PIS: 43.26, ICMSTE: 74.03, ICMSTUSD: 103.19, regraIcmsNI: "CHEIO",  regraPisCofinsNI: "CHEIO", cipPorKwh: 0.10 },
 };
 
 export type NomeBandeira = 'Verde' | 'Amarela' | 'Vermelha P1' | 'Vermelha P2';
